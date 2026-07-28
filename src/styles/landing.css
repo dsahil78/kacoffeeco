@@ -6,6 +6,7 @@
 
 /* ---------- SHARED PRODUCT FRAME ---------- */
 .pframe {
+  aspect-ratio: var(--pframe-ratio, 1 / 1);
   position: relative;
   margin: 0;
   border-radius: 22px;
@@ -647,13 +648,18 @@
   margin: 0 auto;
   text-align: center;
   font-family: var(--sans);
-  font-size: clamp(2.8rem, 7.6vw, 7.1rem);
+  /* Dialled back ~25% from clamp(2.8rem, 7.6vw, 7.1rem) — at full size this
+     statement shouted over the release story above it. */
+  font-size: clamp(2.1rem, 5.7vw, 5.3rem);
   font-weight: 780;
-  line-height: 0.94;
-  letter-spacing: -0.08em;
+  line-height: 0.96;
+  letter-spacing: -0.075em;
 }
 .product-philosophy span {
-  color: rgba(23, 17, 12, 0.42);
+  /* 0.42 alpha measured 2.71:1 — under the 3:1 floor even for display type,
+     and this is a real sentence rather than decoration. 0.5 reads just as
+     recessive against the 16.6:1 of the line above it, at 3.43:1. */
+  color: rgba(23, 17, 12, 0.5);
 }
 
 .plan {
@@ -1070,8 +1076,17 @@
   stroke: #17110c;
 }
 .closer {
-  padding-block: clamp(72px, 10vw, 140px);
+  /* No bottom padding on purpose: .site-footer contributes its own margin-top
+     below this. Setting both stacked ~140px of closer padding on top of ~148px
+     of footer margin — twice as much air under the CTA as above the heading.
+     The two values below are deliberately the same so the block sits centred
+     between its hairlines, and both are tighter than the page's --section
+     rhythm because a closing CTA reads better compact than airy. */
+  padding-block: clamp(56px, 7vw, 104px) 0;
   border-top: 1px solid rgba(23, 17, 12, 0.08);
+}
+.closer + .wrap .site-footer {
+  margin-top: clamp(56px, 7vw, 104px);
 }
 
 @media (min-width: 900px) {
@@ -1148,5 +1163,316 @@
   .hero-photo-shell,
   .hero-photo-caption {
     justify-self: start;
+  }
+}
+
+/* ==========================================================================
+   HERO — ABOVE-THE-FOLD PASS (mobile)
+
+   Goal: on a phone the whole proposition — release, headline, taste, product,
+   price and the order button — should land in the first screen, with the CTA
+   sitting under the photograph rather than above it.
+
+   `.hero-actions` is a grid sibling of the copy and the visual, so the running
+   order is set entirely by grid areas: no duplicated markup, and the DOM order
+   still reads copy → product → action for assistive tech.
+   ========================================================================== */
+@media (max-width: 899px) {
+  .hero {
+    grid-template-areas:
+      'copy'
+      'visual'
+      'actions';
+    /* The section no longer forces a viewport-height box: the content is now
+       tuned to fit one, and forcing both would strand space under the CTA. */
+    min-height: 0;
+    gap: 15px;
+    padding-block: 4px 20px;
+    align-content: start;
+  }
+  .hero-copy {
+    grid-area: copy;
+  }
+  .hero-visual {
+    grid-area: visual;
+  }
+  .hero-actions {
+    grid-area: actions;
+    display: grid;
+    gap: 10px;
+    justify-items: stretch;
+    text-align: center;
+  }
+
+  /* Tighten the type stack. Every value here buys vertical room, so each one
+     is the smallest size that still holds its place in the hierarchy. */
+  .hero .eyebrow {
+    margin-bottom: 12px;
+  }
+  .hero-title {
+    font-size: clamp(2.25rem, 10.8vw, 3.1rem);
+    line-height: 0.95;
+    margin-bottom: 10px;
+  }
+  .hero-lede {
+    font-size: 0.94rem;
+    line-height: 1.48;
+    margin-bottom: 12px;
+    max-width: 38ch;
+  }
+  /* The nav is chrome, not content — give its height back to the hero. */
+  .site-nav {
+    padding-block: 13px;
+  }
+  .hero-taste {
+    margin-bottom: 0;
+  }
+
+  /* A cinematic band instead of a square. The beans crop happily to a wide
+     ratio, and this is where most of the reclaimed height comes from — the
+     square photo plus its stacked caption ran to 460px on its own.
+     svh keeps it honest when mobile browser chrome expands and collapses. */
+  .hero-photo-shell {
+    padding: clamp(8px, 2.2vw, 12px);
+  }
+  .hero-frame {
+    /* A cinematic band on phones instead of the desktop square. */
+    aspect-ratio: auto;
+    height: clamp(136px, 22svh, 226px);
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  /* Caption on one line: label above, origin and spec side by side. */
+  .hero-photo-caption {
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 1px 12px;
+    margin-top: 0;
+    padding: 10px 4px 0;
+  }
+  .hero-photo-caption span {
+    grid-column: 1 / -1;
+  }
+  .hero-photo-caption em {
+    text-align: right;
+    font-size: 0.76rem;
+  }
+
+  .hero-price {
+    text-align: center;
+  }
+}
+
+/* Desktop keeps the original composition: copy and actions stacked in the left
+   column, product filling the right across both rows. */
+@media (min-width: 900px) {
+  .hero {
+    grid-template-areas:
+      'copy visual'
+      'actions visual';
+    grid-template-rows: auto auto;
+    align-content: center;
+    /* Copy and actions are two grid rows now that actions is a sibling, but
+       they used to be one flow — so no row gap. The spacing between the taste
+       line and the button is still .hero-taste's own margin, exactly as before
+       the split. */
+    row-gap: 0;
+  }
+  .hero-copy {
+    grid-area: copy;
+  }
+  .hero-visual {
+    grid-area: visual;
+    align-self: center;
+  }
+  .hero-actions {
+    grid-area: actions;
+  }
+  /* The hero frame declares no inline ratio, so its square crop lives here. */
+  .hero-frame {
+    aspect-ratio: 1 / 1;
+    height: auto;
+  }
+}
+
+/* Short phones (iPhone SE and friends, ~667px tall). The same hero, trimmed
+   further so the order button still lands in the first screen — the image
+   gives up the most, because it is the one element that reads fine smaller. */
+@media (max-width: 899px) and (max-height: 700px) {
+  .hero {
+    gap: 11px;
+    padding-block: 2px 8px;
+  }
+  .hero-actions {
+    gap: 7px;
+  }
+  .hero-title {
+    font-size: clamp(2rem, 9.6vw, 2.6rem);
+    margin-bottom: 8px;
+  }
+  .hero-lede {
+    font-size: 0.9rem;
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+  .hero-frame {
+    height: clamp(100px, 15.5svh, 150px);
+  }
+  .hero-photo-caption {
+    padding-top: 6px;
+  }
+}
+
+/* ---------- FINAL MOBILE HERO LOCK ----------
+   Reviewed phone composition: compact nav chrome, composed image, and one
+   tasteful purchase row instead of a giant full-width CTA. Keep at file end. */
+@media (max-width: 899px) {
+  .site-nav {
+    padding-block: 16px 10px;
+    gap: 12px;
+  }
+  .brand {
+    gap: 10px;
+  }
+  .brand > svg {
+    width: 40px;
+    height: 40px;
+  }
+  .brand .wm .k {
+    font-size: 1.12rem;
+  }
+  .brand .wm .c {
+    margin-top: 4px;
+    font-size: 0.46rem;
+    letter-spacing: 0.32em;
+  }
+  .nav-cta .btn {
+    min-height: 36px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    letter-spacing: 0;
+    box-shadow: 0 14px 34px -26px rgba(23, 17, 12, 0.82);
+  }
+
+  .hero {
+    gap: 18px;
+    padding-block: 22px 36px;
+  }
+  .hero .eyebrow {
+    margin-bottom: 14px;
+    font-size: 0.64rem;
+    letter-spacing: 0.18em;
+  }
+  .hero-title {
+    max-width: 8.2ch;
+    font-size: clamp(2.75rem, 12.2vw, 3.8rem);
+    line-height: 0.88;
+    letter-spacing: -0.085em;
+    margin-bottom: 18px;
+  }
+  .hero-lede {
+    max-width: 34ch;
+    margin-bottom: 18px;
+    font-size: clamp(1rem, 4.3vw, 1.12rem);
+    line-height: 1.52;
+  }
+  .hero-taste {
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .hero-taste span {
+    min-height: 32px;
+    padding: 7px 11px;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-photo-shell {
+    width: 100%;
+    padding: 9px;
+    border-radius: 30px;
+  }
+  .hero-frame {
+    height: clamp(200px, 32svh, 280px);
+    border-radius: 22px;
+  }
+  .hero-frame .pframe-media {
+    object-position: 50% 50%;
+    transform: scale(1.03);
+    filter: saturate(0.98) contrast(1.04) brightness(0.9);
+  }
+  .hero-photo-caption {
+    width: 100%;
+    grid-template-columns: 1fr auto;
+    margin-top: 11px;
+    padding-inline: 3px;
+  }
+  .hero-photo-caption strong {
+    font-size: 1rem;
+  }
+  .hero-photo-caption em {
+    font-size: 0.78rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    text-align: left;
+  }
+  .hero-cta.btn.lg {
+    width: auto;
+    min-height: 50px;
+    padding: 13px 19px;
+    font-size: 0.94rem;
+    white-space: nowrap;
+  }
+  .hero-price {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    text-align: right;
+    color: rgba(23, 17, 12, 0.56);
+    font-size: 0.88rem;
+    line-height: 1.2;
+  }
+  .hero-price strong {
+    display: block;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .hero-cta.btn.lg {
+    justify-self: start;
+    width: 100%;
+  }
+  .hero-price {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 899px) and (max-height: 700px) {
+  .hero {
+    gap: 13px;
+    padding-block: 12px 24px;
+  }
+  .hero-title {
+    font-size: clamp(2.35rem, 10.8vw, 3.1rem);
+    margin-bottom: 12px;
+  }
+  .hero-lede {
+    font-size: 0.94rem;
+    margin-bottom: 12px;
+  }
+  .hero-frame {
+    height: clamp(150px, 24svh, 210px);
   }
 }

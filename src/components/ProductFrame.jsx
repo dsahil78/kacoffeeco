@@ -22,7 +22,11 @@ export function ProductFrame({
   return (
     <figure
       className={`pframe pframe--${tone} ${className}`.trim()}
-      style={{ aspectRatio: ratio }}
+      // Pass ratio={null} to hand the crop entirely to CSS. Anything inline —
+      // aspect-ratio or a custom property — outranks every stylesheet rule, so
+      // a frame that needs to re-crop per breakpoint (the hero does) cannot
+      // declare its ratio here.
+      style={ratio ? { '--pframe-ratio': ratio } : undefined}
     >
       {src ? (
         <img

@@ -525,6 +525,10 @@
   color: var(--dim);
 }
 .summary-total-amt {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.045em;
   font-family: var(--serif);
   font-size: 1.9rem;
   font-weight: 600;
@@ -532,6 +536,9 @@
   text-transform: none;
   color: var(--espresso);
   font-variant-numeric: tabular-nums;
+}
+.summary-total-currency {
+  font-size: 1em;
 }
 
 .summary-assure {
@@ -584,6 +591,150 @@
 @media (max-width: 899px) {
   .flow-grid--summary-first .summary {
     order: -1;
+  }
+}
+
+/* ==========================================================================
+   MOBILE PAYMENT POLISH
+   Final phone treatment: flatter review, precise receipt, and no empty iframe
+   tail after the visible Hyperswitch fields.
+   ========================================================================== */
+@media (max-width: 639px) {
+  .flow {
+    padding-block: 0 48px;
+  }
+  .steps {
+    margin-bottom: 24px;
+  }
+  .flow-grid--summary-first {
+    row-gap: 0;
+  }
+  .pay-hero {
+    margin-bottom: 18px;
+  }
+  .pay-hero .eyebrow {
+    margin-bottom: 12px;
+  }
+  .pay-hero .flow-title {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 10vw, 2.55rem);
+    font-weight: 760;
+    letter-spacing: -0.06em;
+  }
+  .pay-hero .flow-lede {
+    margin-bottom: 0;
+    color: rgba(23, 17, 12, 0.58);
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .pay-review {
+    margin-bottom: 14px !important;
+    border-radius: 22px;
+    background: rgba(255, 250, 242, 0.78);
+    box-shadow:
+      inset 0 0 0 1px rgba(23, 17, 12, 0.08),
+      0 22px 54px -44px rgba(23, 17, 12, 0.5);
+  }
+  .pay-review-head {
+    padding: 14px 18px;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+  }
+  .pay-review-grid {
+    display: grid;
+  }
+  .pay-review-item {
+    padding: 16px 18px;
+  }
+  .pay-review-item--shipping {
+    padding-bottom: 18px;
+  }
+  .pay-review-label {
+    margin-bottom: 8px;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+  }
+  .pay-review-address {
+    font-size: 1.04rem;
+    font-weight: 720;
+    line-height: 1.42;
+    letter-spacing: -0.015em;
+  }
+  .pay-review-value {
+    font-size: 1rem;
+    font-weight: 680;
+  }
+  .pay-review-edit {
+    color: var(--crema-lo);
+    font-size: 0.86rem;
+    font-weight: 650;
+  }
+
+  .flow-grid--summary-first .summary {
+    margin-bottom: 18px;
+  }
+  .summary--compact .summary-card {
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 4px 14px;
+    padding: 12px 14px;
+    border-radius: 22px;
+    background: rgba(255, 250, 242, 0.72);
+    box-shadow:
+      inset 0 0 0 1px rgba(23, 17, 12, 0.08),
+      0 20px 48px -42px rgba(23, 17, 12, 0.42);
+  }
+  .summary--compact .summary-card::before {
+    height: 3px;
+    opacity: 0.9;
+  }
+  .summary--compact .summary-media {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+  }
+  .summary--compact .summary-id {
+    grid-column: 2 / 4;
+    align-items: baseline;
+    gap: 4px 9px;
+  }
+  .summary--compact .summary-name {
+    font-family: var(--serif);
+    font-size: 1.03rem;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+  .summary--compact .summary-origin {
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  .summary--compact .summary-total {
+    grid-column: 2 / 4;
+    gap: 10px;
+    color: rgba(23, 17, 12, 0.56);
+  }
+  .summary--compact .summary-total-amt {
+    font-family: var(--sans);
+    font-size: 1.38rem;
+    font-weight: 760;
+    letter-spacing: -0.05em;
+  }
+
+  .pay-stage {
+    padding: 14px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: rgba(255, 250, 242, 0.78);
+    box-shadow:
+      inset 0 0 0 1px rgba(23, 17, 12, 0.1),
+      0 24px 70px -58px rgba(23, 17, 12, 0.58);
+  }
+  .pay-loading {
+    inset: 14px;
+  }
+  .pay-mount {
+    max-height: 610px;
+    overflow: hidden;
   }
 }
 
@@ -984,5 +1135,196 @@
   }
   .celebrate-seal .rays {
     opacity: 0.42;
+  }
+}
+
+/* ==========================================================================
+   COMPACT ORDER SUMMARY (payment step, phones)
+
+   Sits directly under "Review details" — you confirm where it ships, who it is
+   for, and what it costs as one block, then pay. Above the shipping recap it
+   read as a stray card; below it, the three facts group.
+
+   Placement uses `display: contents` on .flow-main so the summary (a sibling of
+   it) can be ordered *between* that section's children. Reordering across two
+   containers is not otherwise possible without duplicating markup.
+
+   Kept deliberately small: the full spec was already read on the details step,
+   and Unified Checkout only lays out once its mount reaches the viewport, so
+   every pixel above the form delays the widget painting.
+   ========================================================================== */
+@media (max-width: 899px) {
+  .flow-grid--summary-first .flow-main {
+    display: contents;
+  }
+  .flow-grid--summary-first {
+    row-gap: 0;
+  }
+  .flow-grid--summary-first .pay-hero { order: 1; }
+  .flow-grid--summary-first .notice { order: 2; }
+  .flow-grid--summary-first .pay-review { order: 3; margin-bottom: 12px; }
+  .flow-grid--summary-first .summary { order: 4; margin-bottom: 18px; }
+  .flow-grid--summary-first .pay-stage { order: 5; }
+  .flow-grid--summary-first .sr-only { order: 6; }
+  .flow-grid--summary-first .pay-cta { order: 7; }
+  .flow-grid--summary-first .form-fine { order: 8; }
+
+  /* Two lines beside the thumbnail: what it is, then what it costs. */
+  .summary--compact .summary-card {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    align-items: center;
+    gap: 3px 13px;
+    padding: 13px 15px;
+    border-radius: 16px;
+  }
+  .summary--compact .summary-head {
+    display: contents;
+  }
+  .summary--compact .summary-media {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    border-radius: 11px;
+  }
+  .summary--compact .summary-id {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+  }
+  .summary--compact .summary-name {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+  .summary--compact .summary-origin {
+    margin: 0;
+    font-size: 0.78rem;
+  }
+
+  /* Label and amount inline on the left, under the product name. */
+  .summary--compact .summary-total {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-size: 0.6rem;
+    letter-spacing: 0.13em;
+  }
+  .summary--compact .summary-total-amt {
+    font-size: 1.24rem;
+    line-height: 1.1;
+  }
+
+  .summary--compact .summary-id .eyebrow,
+  .summary--compact .summary-notes,
+  .summary--compact .summary-spec,
+  .summary--compact .summary-lines,
+  .summary--compact .summary-assure,
+  .summary--compact .summary-back {
+    display: none;
+  }
+}
+
+/* ---------- FINAL MOBILE PAYMENT LOCK ----------
+   This intentionally comes after the older compact-summary rules so the phone
+   payment screen keeps the reviewed, tighter composition. */
+@media (max-width: 639px) {
+  .flow-grid--summary-first {
+    row-gap: 0;
+  }
+  .pay-review {
+    margin-bottom: 14px !important;
+    border-radius: 22px;
+    background: rgba(255, 250, 242, 0.78);
+    box-shadow:
+      inset 0 0 0 1px rgba(23, 17, 12, 0.08),
+      0 22px 54px -44px rgba(23, 17, 12, 0.5);
+  }
+  .pay-review-head {
+    padding: 14px 18px;
+  }
+  .pay-review-item {
+    padding: 16px 18px;
+  }
+  .pay-review-address {
+    font-size: 1.04rem;
+    font-weight: 720;
+    line-height: 1.42;
+    letter-spacing: -0.015em;
+  }
+
+  .summary--compact .summary-card {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 14px;
+    padding: 12px 14px;
+    border-radius: 22px;
+    background: rgba(255, 250, 242, 0.72);
+    box-shadow:
+      inset 0 0 0 1px rgba(23, 17, 12, 0.08),
+      0 20px 48px -42px rgba(23, 17, 12, 0.42);
+  }
+  .summary--compact .summary-card::before {
+    height: 3px;
+  }
+  .summary--compact .summary-media {
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
+  }
+  .summary--compact .summary-id {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 9px;
+  }
+  .summary--compact .summary-name {
+    font-size: 1.03rem;
+    line-height: 1.15;
+  }
+  .summary--compact .summary-origin {
+    font-size: 0.82rem;
+  }
+  .summary--compact .summary-total {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    display: grid;
+    gap: 1px;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    text-align: center;
+    color: rgba(23, 17, 12, 0.56);
+    line-height: 1;
+  }
+  .summary--compact .summary-total-amt {
+    font-family: var(--sans);
+    font-size: 1.7rem;
+    font-weight: 760;
+    letter-spacing: -0.07em;
+    justify-self: center;
+  }
+
+  .pay-stage {
+    padding: 14px;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .pay-loading {
+    inset: 14px;
+  }
+  .pay-mount {
+    max-height: 610px;
+    overflow: hidden;
   }
 }

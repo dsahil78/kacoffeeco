@@ -9,17 +9,26 @@ import { PLAN, formatMoney } from '../lib/plan.js'
 const MOUNT_ID = 'unified-checkout'
 
 /**
- * Height reserved for the widget before it reports in, so nothing shifts.
- *
- * Measured from the real sandbox widget plus the stage's own padding: 512px on
- * desktop, 499px on mobile. Reserve slightly above the tallest case — the stage
- * only ever grows past this value, so under-reserving costs a layout shift
- * while over-reserving costs a few invisible pixels of padding.
- *
- * Re-measure this if the widget's contents change (different wallets enabled,
- * or an `appearance` theme with different metrics).
+ * The widget's own painted height, measured from the live sandbox. It is
+ * ~432px at every viewport — only the stage's padding around it differs, so we
+ * reserve this plus whatever padding the current breakpoint applies rather than
+ * hard-coding a total. A fixed total is what left visible dead space under the
+ * form when disabling the save-card checkbox made the widget shorter.
  */
-const RESERVED_HEIGHT = 516
+const DEFAULT_WIDGET_HEIGHT = 432
+const MOBILE_WIDGET_HEIGHT = 610
+
+/** Cache key so a second checkout in the same tab reserves the exact height. */
+const WIDGET_HEIGHT_KEY = 'kacc.widgetHeight'
+
+function cachedWidgetHeight() {
+  try {
+    const v = Number(sessionStorage.getItem(WIDGET_HEIGHT_KEY))
+    return Number.isFinite(v) && v > 200 && v < 1200 ? v : DEFAULT_WIDGET_HEIGHT
+  } catch {
+    return DEFAULT_WIDGET_HEIGHT
+  }
+}
 
 /**
  * If the SDK's `ready` event never arrives we still have to hand over — the
@@ -27,6 +36,9 @@ const RESERVED_HEIGHT = 516
  * be worse than one that lifts early.
  */
 const READY_TIMEOUT_MS = 12000
+
+/** Below this the widget has not actually painted, whatever the SDK claims. */
+const MIN_PAINTED_HEIGHT = 100
 
 export default function Payment() {
   const navigate = useNavigate()
@@ -39,16 +51,25 @@ export default function Payment() {
   const email = handoff?.email ?? null
   const shipping = handoff?.shipping ?? null
 
-  const [ready, setReady] = useState(false)
+  // Two separate signals. `readySignal` is the SDK telling us it is done;
+  // `mountHeight` is proof it actually painted something. Unified Checkout only
+  // lays out once its mount enters the viewport, so on a phone the signal can
+  // arrive while the iframe is still collapsed at 9px. Revealing on the signal
+  // alone would swap a polished skeleton for an empty box.
+  const [readySignal, setReadySignal] = useState(false)
+  const [mountHeight, setMountHeight] = useState(0)
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState(null)
-  const [stageHeight, setStageHeight] = useState(RESERVED_HEIGHT)
+  // The stage's own vertical padding, read from the DOM so the reservation
+  // tracks the breakpoint instead of assuming one value.
+  const [stagePadding, setStagePadding] = useState(32)
 
   // Imperative SDK handles live in refs — putting them in state would re-render
   // the page every time the widget re-initialises.
   const hyperRef = useRef(null)
   const widgetsRef = useRef(null)
   const mountRef = useRef(null)
+  const stageRef = useRef(null)
 
   useEffect(() => {
     if (!clientSecret) return undefined
@@ -69,7 +90,7 @@ export default function Payment() {
         // completing is not the same thing — that is why the form used to pop
         // in several seconds after we claimed it was there.
         unifiedCheckout.on?.('ready', () => {
-          if (!cancelled) setReady(true)
+          if (!cancelled) setReadySignal(true)
         })
 
         unifiedCheckout.mount(`#${MOUNT_ID}`)
@@ -79,7 +100,7 @@ export default function Payment() {
         element = unifiedCheckout
 
         timeout = setTimeout(() => {
-          if (!cancelled) setReady(true)
+          if (!cancelled) setReadySignal(true)
         }, READY_TIMEOUT_MS)
       } catch (mountError) {
         if (cancelled) return
@@ -103,7 +124,8 @@ export default function Payment() {
         /* the widget was already gone */
       }
       widgetsRef.current = null
-      setReady(false)
+      setReadySignal(false)
+      setMountHeight(0)
     }
   }, [clientSecret])
 
@@ -113,9 +135,27 @@ export default function Payment() {
     const node = mountRef.current
     if (!node || typeof ResizeObserver === 'undefined') return undefined
 
+    const readPadding = () => {
+      const stage = stageRef.current
+      if (!stage) return
+      const cs = getComputedStyle(stage)
+      setStagePadding(parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom))
+    }
+    readPadding()
+
     const observer = new ResizeObserver(([entry]) => {
       const height = entry?.contentRect?.height ?? 0
-      if (height > 0) setStageHeight(Math.max(height, 180))
+      setMountHeight(height)
+      readPadding()
+      // Remember what the widget actually needed, so the next checkout in this
+      // tab reserves precisely and never shifts at all.
+      if (height > MIN_PAINTED_HEIGHT) {
+        try {
+          sessionStorage.setItem(WIDGET_HEIGHT_KEY, String(Math.round(height)))
+        } catch {
+          /* private browsing — the default reservation is fine */
+        }
+      }
     })
     observer.observe(node)
     return () => observer.disconnect()
@@ -162,11 +202,29 @@ export default function Payment() {
     }
   }, [confirming, navigate, orderId])
 
+  // Only hand over when the SDK has reported in *and* the widget has real
+  // height. MIN_PAINTED_HEIGHT is well under the ~432px a rendered form
+  // occupies, but well over the 9px of a collapsed one.
+  const ready = readySignal && mountHeight > MIN_PAINTED_HEIGHT
+
+  // Before the widget paints, hold open the height it is expected to need.
+  // Once it has painted, match its real height exactly — no dead space below
+  // the form, and no movement because the two values agree.
+  const isNarrow =
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches
+  const expectedWidgetHeight = isNarrow
+    ? Math.min(cachedWidgetHeight(), MOBILE_WIDGET_HEIGHT)
+    : cachedWidgetHeight()
+  const paintedWidgetHeight = isNarrow
+    ? Math.min(mountHeight, MOBILE_WIDGET_HEIGHT)
+    : mountHeight
+  const stageMinHeight = (ready ? paintedWidgetHeight : expectedWidgetHeight) + stagePadding
+
   if (!clientSecret) return <MissingSecret />
 
   return (
     <FlowLayout step={1}>
-      <div className="flow-grid">
+      <div className="flow-grid flow-grid--summary-first">
         <section className="flow-main">
           <div className="pay-hero">
             <span className="eyebrow">Secure payment</span>
@@ -205,14 +263,10 @@ export default function Payment() {
             </div>
           </div>
 
-          {/* The stage only ever grows past the reservation, never shrinks back
-              to meet a shorter widget. Animating a small shrink looks tidy but
-              every frame of it counts as a layout shift, which is precisely the
-              thing the reservation exists to prevent — a few pixels of unused
-              space is invisible, a settling container is not. */}
           <div
+            ref={stageRef}
             className={`pay-stage${ready ? ' is-ready' : ''}`}
-            style={{ minHeight: Math.max(RESERVED_HEIGHT, ready ? stageHeight : 0) }}
+            style={{ minHeight: stageMinHeight }}
           >
             {!error && (
               <div className="pay-loading">
@@ -263,7 +317,7 @@ export default function Payment() {
           </p>
         </section>
 
-        <OrderSummary>
+        <OrderSummary compact>
           <Link to="/checkout" className="link summary-back">
             ← Edit your details
           </Link>

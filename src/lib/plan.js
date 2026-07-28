@@ -31,18 +31,26 @@ export const PLAN = {
 
 const formatters = new Map()
 
-export function formatMoney(cents, currency = PLAN.currency) {
-  if (!formatters.has(currency)) {
+export function formatMoney(cents, currency = PLAN.currency, options = {}) {
+  const centsDisplay = options.cents ?? 'auto'
+  const key = `${currency}:${centsDisplay}`
+
+  if (!formatters.has(key)) {
     formatters.set(
-      currency,
+      key,
       new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency,
-        minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+        minimumFractionDigits: centsDisplay === 'always' ? 2 : cents % 100 === 0 ? 0 : 2,
+        maximumFractionDigits: 2,
       }),
     )
   }
-  return formatters.get(currency).format(cents / 100)
+  return formatters.get(key).format(cents / 100)
+}
+
+export function formatMoneyWithCents(cents, currency = PLAN.currency) {
+  return formatMoney(cents, currency, { cents: 'always' })
 }
 
 /** "Roasts Tuesday" — a concrete near-future date beats a vague promise. */

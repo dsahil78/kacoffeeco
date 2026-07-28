@@ -60,22 +60,12 @@ export default function Landing() {
               <span>Dried fig</span>
               <span>Caramel finish</span>
             </p>
-
-            <div className="hero-actions">
-              <Link to="/checkout" className="btn btn-primary lg hero-cta">
-                Order the release
-                <Arrow />
-              </Link>
-              <span className="hero-price">
-                <strong>{formatMoney(PLAN.amountCents)}</strong>/month · free shipping
-              </span>
-            </div>
           </div>
 
           <div className="hero-visual">
             <div className="hero-photo-shell">
               <ProductFrame
-                ratio="1 / 1"
+                ratio={null}
                 tone="dark"
                 className="hero-frame"
                 src={HERO_PHOTO}
@@ -88,6 +78,19 @@ export default function Landing() {
               <strong>Finca La Esperanza</strong>
               <em>12 oz · washed · medium roast</em>
             </div>
+          </div>
+
+          {/* A sibling of the copy and the visual rather than nested inside the
+              copy, so the grid can place it under the photo on a phone and
+              beside it on desktop without duplicating any markup. */}
+          <div className="hero-actions">
+            <Link to="/checkout" className="btn btn-primary lg hero-cta">
+              Order the release
+              <Arrow />
+            </Link>
+            <span className="hero-price">
+              <strong>{formatMoney(PLAN.amountCents)}</strong>/month · free shipping
+            </span>
           </div>
         </section>
       </main>

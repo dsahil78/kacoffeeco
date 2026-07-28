@@ -50,11 +50,14 @@ function Steps({ current }) {
  * Deliberately detailed: at the point of handing over a card, specifics
  * (origin, roast, what ships when) do more to reassure than reassuring words.
  */
-export function OrderSummary({ children }) {
+export function OrderSummary({ children, compact = false }) {
   const { spec } = PLAN
 
   return (
-    <aside className="summary" aria-label="Order summary">
+    <aside
+      className={`summary${compact ? ' summary--compact' : ''}`}
+      aria-label="Order summary"
+    >
       <div className="summary-card">
         <div className="summary-head">
           <ProductFrame ratio="1 / 1" tone="dark" className="summary-media">
@@ -106,7 +109,7 @@ export function OrderSummary({ children }) {
 
         <div className="summary-total">
           <span>Due today</span>
-          <span className="summary-total-amt">{formatMoney(PLAN.amountCents)}</span>
+          <MoneyAmount cents={PLAN.amountCents} />
         </div>
 
         <ul className="summary-assure">
@@ -127,6 +130,21 @@ export function OrderSummary({ children }) {
         {children}
       </div>
     </aside>
+  )
+}
+
+function MoneyAmount({ cents }) {
+  const amount = formatMoney(cents)
+  const match = amount.match(/^([^0-9-]+)(.+)$/)
+  if (!match) return <span className="summary-total-amt">{amount}</span>
+
+  return (
+    <span className="summary-total-amt" aria-label={amount}>
+      <span aria-hidden="true" className="summary-total-currency">
+        {match[1]}
+      </span>
+      <span aria-hidden="true">{match[2]}</span>
+    </span>
   )
 }
 
