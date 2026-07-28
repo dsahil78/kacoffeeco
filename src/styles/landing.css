@@ -1,277 +1,359 @@
 /* ==========================================================================
-   Landing page — hero ported from the reference, then extended into the
-   sections the flow needs (ritual, plan, closer).
+   Landing — mobile-first.
+   Rhythm is deliberate: cinematic hero → signature promise → editorial detail →
+   dark release story → philosophy line → the single plan → closer.
    ========================================================================== */
+
+/* ---------- SHARED PRODUCT FRAME ---------- */
+.pframe {
+  position: relative;
+  margin: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--espresso);
+  box-shadow: var(--shadow-lg);
+  isolation: isolate;
+}
+.pframe--dark {
+  background: #1e1009;
+}
+.pframe--paper {
+  background: var(--paper-2);
+  box-shadow: var(--shadow-md);
+}
+.pframe > svg,
+.pframe .pframe-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* A soft inner rim so artwork and photography both sit in the frame. */
+.pframe::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(230, 187, 99, 0.16);
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .pframe {
+    border-radius: 28px;
+  }
+}
 
 /* ---------- HERO ---------- */
 .hero {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 40px;
-  align-items: center;
-  padding: 34px 0 70px;
-  position: relative;
+  gap: 36px;
+  padding-block: 8px var(--section-tight);
 }
-.hero h1 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(3rem, 6.4vw, 5.3rem);
+.hero-title {
+  font-size: clamp(2.7rem, 13vw, 4rem);
   line-height: 0.98;
-  letter-spacing: -0.025em;
-  margin: 0 0 22px;
+  letter-spacing: -0.03em;
+  margin: 0 0 18px;
 }
-.hero h1 em {
+.hero-title em {
   font-style: italic;
   color: var(--crema-lo);
 }
-.hero .lede {
-  font-size: 1.12rem;
+.hero-lede {
+  font-size: 1.04rem;
   color: var(--dim);
-  max-width: 44ch;
-  margin: 0 0 34px;
+  max-width: 46ch;
+  margin: 0 0 18px;
 }
-.hero-actions {
+
+/* Sensory detail, right under the promise — this is the line that makes
+   someone want the coffee rather than admire the page. */
+.hero-taste {
   display: flex;
-  align-items: center;
-  gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 40px;
-}
-.price-tag {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-.price-tag .amt {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.5rem;
-  font-variant-numeric: tabular-nums;
-}
-.price-tag .amt .per {
-  font-size: 0.9rem;
-  font-weight: 400;
-  color: var(--dim);
-}
-.price-tag .lbl {
-  font-size: 0.72rem;
-  color: var(--dim);
-  letter-spacing: 0.04em;
-}
-.proof {
-  display: flex;
-  gap: 30px;
   align-items: center;
-}
-.proof .stars {
-  color: var(--crema);
-  letter-spacing: 2px;
-  font-size: 0.95rem;
-}
-.proof .p-num {
+  gap: 8px;
+  margin: 0 0 30px;
   font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.15rem;
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--mocha);
 }
-.proof .p-cap {
-  font-size: 0.76rem;
+.hero-taste i {
+  color: var(--crema);
+  font-style: normal;
+}
+.hero-taste span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+}
+
+.hero-actions {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  margin-bottom: 34px;
+}
+.hero-cta {
+  width: 100%;
+}
+.btn-arrow {
+  transition: transform var(--t-mid) var(--ease-out);
+}
+.btn:hover .btn-arrow {
+  transform: translateX(4px);
+}
+.hero-price {
+  font-size: 0.86rem;
   color: var(--dim);
 }
-.proof .divider {
-  width: 1px;
-  height: 34px;
-  background: rgba(90, 26, 32, 0.18);
+.hero-price strong {
+  font-family: var(--serif);
+  font-size: 1.06rem;
+  color: var(--espresso);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---------- HERO VISUAL ---------- */
-.visual {
+.hero-visual {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 520px;
 }
-.disc {
-  position: absolute;
-  width: 440px;
-  height: 440px;
-  border-radius: 50%;
-  background: radial-gradient(120% 120% at 34% 26%, #5c3a22 0%, #3a2415 55%, #2a1810 100%);
-  box-shadow:
-    inset 0 2px 40px rgba(0, 0, 0, 0.35),
-    0 40px 80px -30px rgba(58, 36, 21, 0.6);
-}
-.disc::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgba(230, 187, 99, 0.25);
-}
-.glow {
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(230, 187, 99, 0.4), transparent 65%);
-  filter: blur(14px);
-}
-/* Swap this selector's element for an <img> when real photography arrives. */
-.cup-svg {
+.hero-photo-shell {
   position: relative;
-  width: 430px;
-  height: auto;
-  z-index: 3;
-  filter: drop-shadow(0 26px 30px rgba(20, 10, 4, 0.5));
 }
-.seal {
-  position: absolute;
-  z-index: 4;
-  bottom: 44px;
-  left: calc(50% - 220px);
-  width: 118px;
-  height: 118px;
-  animation: spin 44s linear infinite;
+.hero-frame {
+  box-shadow: var(--shadow-xl);
 }
-.chip {
-  position: absolute;
-  z-index: 5;
-  top: 56px;
-  right: calc(50% - 232px);
-  background: var(--paper);
-  border: 1px solid var(--hairline);
-  border-radius: 16px;
-  padding: 13px 17px;
-  box-shadow: 0 18px 34px -16px rgba(58, 36, 21, 0.5);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  animation: bob 5.5s ease-in-out infinite;
+.hero-frame .pframe-media {
+  object-position: 48% 50%;
+  transform: scale(1.04);
+  filter: saturate(0.92) contrast(1.06) brightness(0.86);
 }
-.chip .dot {
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
-  background: linear-gradient(135deg, var(--crema-hi), var(--crema-lo));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2a1608;
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: 0.95rem;
+.hero-photo-caption {
+  display: grid;
+  gap: 2px;
+  margin-top: 14px;
+  color: rgba(23, 17, 12, 0.58);
 }
-.chip .ct .a {
-  font-weight: 700;
-  font-size: 0.9rem;
+.hero-photo-caption span {
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
-.chip .ct .b {
-  font-size: 0.72rem;
-  color: var(--dim);
+.hero-photo-caption strong {
+  color: var(--espresso);
+  font-size: 0.96rem;
+  letter-spacing: -0.01em;
 }
-.bean {
-  position: absolute;
-  z-index: 4;
-  opacity: 0.9;
-}
-.bean.b1 {
-  top: 24px;
-  left: calc(50% - 150px);
-  animation: bob 6.5s ease-in-out infinite;
-}
-.bean.b2 {
-  bottom: 70px;
-  right: calc(50% - 205px);
-  animation: bob 7.5s ease-in-out 0.6s infinite;
-}
-.bean.b3 {
-  top: 120px;
-  right: calc(50% - 250px);
-  animation: bob 5.8s ease-in-out 0.3s infinite;
+.hero-photo-caption em {
+  font-style: normal;
+  font-size: 0.82rem;
 }
 
-/* ---------- RITUAL ---------- */
+@media (min-width: 640px) {
+  .hero-lede {
+    font-size: 1.12rem;
+  }
+  .hero-taste {
+    font-size: 1.12rem;
+    gap: 10px;
+  }
+  .hero-actions {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .hero-cta {
+    width: auto;
+  }
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: 1.02fr 0.98fr;
+    gap: 56px;
+    align-items: center;
+    padding-block: 24px var(--section);
+  }
+  .hero-title {
+    font-size: clamp(3.4rem, 5.6vw, 5.2rem);
+  }
+  .hero-visual {
+    order: 2;
+  }
+}
+
+/* ---------- RITUAL (editorial list, deliberately card-free) ---------- */
 .ritual {
-  padding: 96px 0 20px;
+  padding-block: var(--section) 0;
 }
 .ritual-head {
   max-width: 62ch;
 }
 .ritual-lede {
-  color: var(--dim);
-  font-size: 1.06rem;
-  margin: 22px 0 0;
-  max-width: 56ch;
+  margin: 20px 0 0;
 }
-.ritual-grid {
+.ritual-list {
+  list-style: none;
+  margin: 44px 0 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  margin-top: 52px;
+  gap: 0;
 }
-.ritual-card {
-  background: var(--paper-2);
-  border: 1px solid var(--hairline);
-  border-radius: 22px;
-  padding: 30px 28px 32px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+.ritual-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  padding-block: 30px;
+  border-top: 1px solid var(--hairline);
 }
-.ritual-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card);
+.ritual-item:last-child {
+  border-bottom: 1px solid var(--hairline);
 }
 .ritual-num {
   font-family: var(--serif);
   font-style: italic;
   font-weight: 600;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: var(--crema-lo);
-  display: block;
-  margin-bottom: 14px;
+  line-height: 1;
+  padding-top: 4px;
 }
-.ritual-card h3 {
+.ritual-body h3 {
   font-size: 1.24rem;
   line-height: 1.2;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
-.ritual-card p {
+.ritual-body p {
   color: var(--dim);
-  font-size: 0.94rem;
+  font-size: 0.95rem;
   margin: 0;
+  max-width: 62ch;
+}
+
+@media (min-width: 900px) {
+  .ritual-list {
+    margin-top: 60px;
+  }
+  .ritual-item {
+    grid-template-columns: 90px 1fr;
+    gap: 40px;
+    padding-block: 40px;
+    transition: background-color var(--t-mid) var(--ease-out);
+  }
+  .ritual-item:hover {
+    background: rgba(236, 224, 203, 0.45);
+  }
+  .ritual-num {
+    font-size: 1.9rem;
+  }
+  .ritual-body {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 40px;
+    align-items: start;
+  }
+  .ritual-body h3 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+}
+
+/* ---------- TASTING BAND ---------- */
+.tasting {
+  margin-top: var(--section);
+  padding-block: var(--section);
+  position: relative;
+  overflow: hidden;
+}
+/* A pool of warm light behind the copy so the dark band is not a flat slab. */
+.tasting::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -10%;
+  width: 70%;
+  height: 140%;
+  background: radial-gradient(circle, rgba(198, 137, 44, 0.16), transparent 62%);
+  pointer-events: none;
+}
+.tasting-inner {
+  position: relative;
+  display: grid;
+  gap: 36px;
+}
+.tasting-spec {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+  margin: 30px 0 0;
+}
+.tasting-spec dt {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--crema-hi);
+  margin-bottom: 5px;
+}
+.tasting-spec dd {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.04rem;
+  color: var(--bone);
+}
+.tasting-media {
+  max-width: 340px;
+  width: 100%;
+  justify-self: center;
+}
+
+@media (min-width: 900px) {
+  .tasting-inner {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .tasting-spec {
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    gap: 34px;
+  }
+  .tasting-media {
+    max-width: none;
+  }
 }
 
 /* ---------- PLAN ---------- */
 .plan {
   display: grid;
-  grid-template-columns: 1fr 0.85fr;
-  gap: 60px;
-  align-items: center;
-  padding: 110px 0 20px;
+  gap: 36px;
+  padding-block: 0 var(--section);
 }
 .plan-lede {
-  color: var(--dim);
-  font-size: 1.06rem;
-  margin: 22px 0 34px;
+  margin: 20px 0 28px;
   max-width: 46ch;
 }
 .plan-meta {
   display: grid;
-  gap: 18px;
+  gap: 0;
   margin: 0;
 }
 .plan-meta > div {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 16px;
-  padding-bottom: 16px;
+  gap: 4px;
+  padding-block: 15px;
   border-bottom: 1px solid var(--hairline);
 }
 .plan-meta dt {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.17em;
   text-transform: uppercase;
   color: var(--crema-lo);
 }
@@ -281,13 +363,13 @@
 }
 
 .plan-card {
-  background: linear-gradient(170deg, #fbf5e9, var(--paper-2));
-  border: 1px solid rgba(198, 137, 44, 0.35);
-  border-radius: 28px;
-  padding: 34px 32px 30px;
-  box-shadow: var(--shadow-card);
+  background: linear-gradient(168deg, #fdf8ee, var(--paper-2));
+  border-radius: 26px;
+  padding: 30px 24px 26px;
+  box-shadow: var(--shadow-xl);
   position: relative;
   overflow: hidden;
+  transition: transform var(--t-slow) var(--ease-out), box-shadow var(--t-slow) var(--ease-out);
 }
 .plan-card::before {
   content: '';
@@ -298,158 +380,773 @@
 }
 .plan-badge {
   display: inline-block;
-  font-size: 0.66rem;
+  font-size: 0.63rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.17em;
   text-transform: uppercase;
   color: var(--oxblood);
   background: rgba(90, 26, 32, 0.08);
   border-radius: 999px;
   padding: 6px 13px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 .plan-name {
-  font-size: 1.7rem;
+  font-size: 1.6rem;
   line-height: 1.1;
 }
 .plan-price {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin: 14px 0 10px;
+  margin: 12px 0 10px;
 }
 .plan-amount {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 3.2rem;
+  font-size: 3rem;
   line-height: 1;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 .plan-cadence {
   color: var(--dim);
-  font-size: 0.96rem;
+  font-size: 0.94rem;
 }
 .plan-blurb {
   color: var(--dim);
-  font-size: 0.94rem;
-  margin: 0 0 24px;
+  font-size: 0.92rem;
+  margin: 0 0 22px;
 }
 .plan-features {
   list-style: none;
-  margin: 0 0 28px;
-  padding: 0 0 24px;
+  margin: 0 0 26px;
+  padding: 0 0 22px;
   border-bottom: 1px solid var(--hairline);
   display: grid;
-  gap: 13px;
+  gap: 12px;
 }
 .plan-features li {
   display: grid;
   grid-template-columns: 16px 1fr;
   gap: 12px;
   align-items: start;
-  font-size: 0.93rem;
+  font-size: 0.91rem;
 }
 .plan-features svg {
   margin-top: 4px;
 }
 .plan-fine {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--dim);
   text-align: center;
-  margin: 16px 0 0;
+  margin: 14px 0 0;
+}
+
+@media (min-width: 900px) {
+  .plan {
+    grid-template-columns: 1fr 0.82fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .plan-card {
+    padding: 36px 34px 30px;
+  }
+  .plan-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 56px 100px -46px rgba(58, 36, 21, 0.66);
+  }
+  .plan-amount {
+    font-size: 3.4rem;
+  }
 }
 
 /* ---------- CLOSER ---------- */
 .closer {
   text-align: center;
-  padding: 120px 0 20px;
+  padding-block: 0 var(--section);
   display: grid;
   justify-items: center;
-  gap: 30px;
+  gap: 26px;
 }
 .closer .section-title {
-  max-width: 18ch;
+  max-width: 20ch;
+}
+.closer-fine {
+  font-size: 0.78rem;
+  color: var(--dim);
+  margin: 0;
 }
 
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 980px) {
-  .ritual-grid {
-    grid-template-columns: 1fr;
+/* ==========================================================================
+   FLAGSHIP PRODUCT PASS
+   Treat the page like a launch surface: fewer modules, stronger rhythm,
+   quieter structure, and product imagery that carries more of the emotion.
+   ========================================================================== */
+
+.hero {
+  min-height: calc(100svh - 88px);
+  padding-block: clamp(42px, 6vw, 88px) clamp(96px, 11vw, 168px);
+}
+.hero-copy {
+  align-self: center;
+}
+.hero-title {
+  max-width: 9.8ch;
+  font-size: clamp(4rem, 10vw, 8.6rem);
+  font-weight: 780;
+  line-height: 0.86;
+  letter-spacing: -0.095em;
+}
+.hero-title em {
+  color: inherit;
+}
+.hero-lede {
+  max-width: 34rem;
+  margin-top: 28px;
+  color: rgba(23, 17, 12, 0.6);
+  font-size: clamp(1.08rem, 1.45vw, 1.26rem);
+  line-height: 1.58;
+}
+.hero-taste {
+  gap: 10px;
+  margin-block: 28px 36px;
+}
+.hero-taste span {
+  min-height: 34px;
+  padding: 8px 12px;
+  border-color: rgba(23, 17, 12, 0.08);
+  background: rgba(255, 250, 242, 0.5);
+  color: rgba(23, 17, 12, 0.66);
+  font-size: 0.7rem;
+}
+.hero-actions {
+  margin-bottom: 0;
+}
+.hero-price {
+  font-size: 0.88rem;
+}
+.hero-photo-shell {
+  isolation: isolate;
+  padding: clamp(12px, 1.5vw, 18px);
+  background:
+    linear-gradient(180deg, rgba(255, 250, 242, 0.7), rgba(235, 228, 216, 0.18)),
+    rgba(255, 250, 242, 0.24);
+}
+.hero-photo-shell::after {
+  content: '';
+  position: absolute;
+  inset: auto 10% -10% 10%;
+  height: 28%;
+  border-radius: 999px;
+  background: rgba(23, 17, 12, 0.18);
+  filter: blur(46px);
+  z-index: -1;
+}
+.hero-frame {
+  overflow: hidden;
+}
+.hero-frame .pframe-media {
+  object-position: 43% 50%;
+  transform: scale(1.16);
+  filter: saturate(0.78) contrast(1.2) brightness(0.62);
+}
+.hero-photo-caption {
+  padding: 18px 10px 5px;
+}
+.hero-photo-caption strong {
+  font-size: 1.02rem;
+}
+
+.signature {
+  padding-block: clamp(72px, 9vw, 124px);
+  border-block: 1px solid rgba(23, 17, 12, 0.08);
+}
+.signature p {
+  max-width: 11ch;
+  margin: 0 0 clamp(34px, 5vw, 58px);
+  font-family: var(--sans);
+  font-size: clamp(3rem, 8.5vw, 7rem);
+  font-weight: 780;
+  line-height: 0.9;
+  letter-spacing: -0.085em;
+}
+.signature dl {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid rgba(23, 17, 12, 0.1);
+}
+.signature dl > div {
+  display: grid;
+  gap: 5px;
+  padding-block: 18px;
+  border-bottom: 1px solid rgba(23, 17, 12, 0.1);
+}
+.signature dt {
+  color: rgba(23, 17, 12, 0.46);
+  font-size: 0.68rem;
+  font-weight: 760;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.signature dd {
+  margin: 0;
+  color: var(--espresso);
+  font-size: 1.02rem;
+  font-weight: 680;
+}
+
+.ritual {
+  padding-block: clamp(104px, 12vw, 188px);
+}
+.ritual-head {
+  max-width: 940px;
+}
+.ritual-lede {
+  max-width: 44rem;
+  color: rgba(23, 17, 12, 0.58);
+}
+.ritual-list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.ritual-item {
+  padding-block: clamp(34px, 5vw, 60px);
+}
+.ritual-body h3 {
+  font-size: clamp(1.45rem, 2.1vw, 2.15rem);
+}
+.ritual-body p {
+  font-size: clamp(0.98rem, 1.25vw, 1.08rem);
+  line-height: 1.65;
+}
+
+.tasting {
+  padding-block: clamp(96px, 12vw, 178px);
+}
+.tasting-inner {
+  min-height: auto;
+}
+.tasting .section-title {
+  max-width: 10ch;
+}
+.tasting-media {
+  border-radius: clamp(28px, 3vw, 44px);
+}
+.tasting-media .pframe-media {
+  object-position: 50% 52%;
+  transform: scale(1.08);
+  filter: saturate(0.9) contrast(1.12) brightness(0.72);
+}
+
+.product-philosophy {
+  padding-block: clamp(100px, 13vw, 190px);
+}
+.product-philosophy p {
+  max-width: 16ch;
+  margin: 0 auto;
+  text-align: center;
+  font-family: var(--sans);
+  font-size: clamp(2.8rem, 7.6vw, 7.1rem);
+  font-weight: 780;
+  line-height: 0.94;
+  letter-spacing: -0.08em;
+}
+.product-philosophy span {
+  color: rgba(23, 17, 12, 0.42);
+}
+
+.plan {
+  padding-block: clamp(20px, 4vw, 56px) clamp(112px, 13vw, 190px);
+}
+.plan-copy {
+  align-self: center;
+}
+.plan-card {
+  align-self: center;
+  border-radius: 34px;
+  padding: clamp(28px, 4vw, 46px);
+}
+.plan-badge {
+  margin-bottom: 20px;
+}
+.plan-name {
+  font-size: clamp(1.8rem, 2.8vw, 2.45rem);
+}
+.plan-amount {
+  font-size: clamp(3.4rem, 6vw, 5.2rem);
+}
+.plan-features li {
+  font-size: 0.96rem;
+}
+.closer {
+  padding-block: clamp(100px, 13vw, 184px);
+}
+.closer .section-title {
+  max-width: 11ch;
+}
+
+@media (min-width: 760px) {
+  .signature {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
+    gap: clamp(54px, 8vw, 110px);
+    align-items: end;
+  }
+  .signature p {
+    margin: 0;
+  }
+  .signature dl > div {
+    grid-template-columns: 0.64fr 1fr;
+    align-items: baseline;
+    gap: 20px;
+  }
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 0.72fr);
+  }
+  .hero-photo-shell {
+    max-width: 540px;
+  }
+  .ritual-body {
+    grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1fr);
+    gap: clamp(48px, 7vw, 96px);
+  }
+  .tasting-inner {
+    grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.78fr);
+    gap: clamp(64px, 8vw, 118px);
   }
   .plan {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    padding-top: 80px;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 639px) {
+  .hero-title {
+    max-width: 8.8ch;
+  }
+  .hero-taste {
+    align-items: flex-start;
+  }
+  .signature p,
+  .product-philosophy p {
+    letter-spacing: -0.07em;
+  }
+}
+
+/* ---------- HERO COMPOSITION FIX ----------
+   Final art-direction pass after visual review: the image should read as one
+   precise product object, not a card with uneven caption padding. */
+.hero {
+  column-gap: clamp(56px, 7vw, 104px);
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 28px;
+}
+.hero-price {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+.hero-visual {
+  display: grid;
+  justify-items: stretch;
+}
+.hero-photo-shell {
+  width: min(100%, 520px);
+  justify-self: end;
+  padding: clamp(10px, 1.1vw, 14px);
+  border-radius: clamp(30px, 3vw, 42px);
+  background:
+    linear-gradient(180deg, rgba(45, 34, 25, 0.1), rgba(23, 17, 12, 0.2)),
+    #ece4d6;
+  box-shadow:
+    inset 0 0 0 1px rgba(23, 17, 12, 0.16),
+    inset 0 1px 0 rgba(255, 250, 242, 0.65),
+    0 46px 118px -76px rgba(23, 17, 12, 0.82),
+    0 14px 34px -26px rgba(23, 17, 12, 0.42);
+}
+.hero-frame {
+  border-radius: calc(clamp(30px, 3vw, 42px) - 10px);
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 246, 236, 0.1),
+    0 0 0 1px rgba(23, 17, 12, 0.16),
+    0 24px 58px -42px rgba(23, 17, 12, 0.82);
+}
+.hero-frame .pframe-media {
+  object-position: 50% 48%;
+  transform: scale(1.06);
+  filter: saturate(0.9) contrast(1.08) brightness(0.82);
+}
+.hero-photo-caption {
+  width: min(100%, 520px);
+  justify-self: end;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 5px 20px;
+  margin-top: 18px;
+  padding-inline: 4px;
+}
+.hero-photo-caption span {
+  grid-column: 1 / -1;
+  color: rgba(23, 17, 12, 0.48);
+  font-size: 0.64rem;
+  font-weight: 780;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.hero-photo-caption strong {
+  color: var(--espresso);
+  font-size: clamp(1rem, 1.35vw, 1.16rem);
+  letter-spacing: -0.02em;
+}
+.hero-photo-caption em {
+  justify-self: end;
+  color: rgba(23, 17, 12, 0.5);
+  font-style: normal;
+  font-size: 0.88rem;
+}
+
+@media (min-width: 900px) {
   .hero {
+    grid-template-columns: minmax(0, 1.02fr) minmax(400px, 0.76fr);
+  }
+}
+
+@media (max-width: 899px) {
+  .hero-photo-shell,
+  .hero-photo-caption {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero-photo-caption {
     grid-template-columns: 1fr;
-    gap: 12px;
-    text-align: center;
   }
-  .hero .eyebrow,
-  .hero-actions,
-  .proof {
-    justify-content: center;
+  .hero-photo-caption em {
+    justify-self: start;
   }
-  .hero .lede {
+}
+
+/* ==========================================================================
+   PREMIUM DIRECTION PASS
+   More flagship launch page than subscription ad: quieter materials, fewer
+   decorative tells, bigger product presence, and sharper spacing.
+   ========================================================================== */
+
+.pframe {
+  border-radius: clamp(24px, 3vw, 38px);
+  background:
+    radial-gradient(circle at 50% 16%, rgba(223, 189, 120, 0.2), transparent 36%),
+    linear-gradient(180deg, #21160f, #0f0b08);
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 246, 236, 0.08),
+    0 70px 140px -92px rgba(23, 17, 12, 0.88);
+}
+.pframe::after {
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 246, 236, 0.1),
+    inset 0 -80px 120px -110px rgba(0, 0, 0, 0.82);
+}
+
+.hero {
+  min-height: calc(100svh - 92px);
+  align-items: center;
+  padding-block: clamp(34px, 5vw, 82px) clamp(88px, 10vw, 148px);
+}
+.hero-copy {
+  max-width: 720px;
+}
+.hero-title {
+  max-width: 11.2ch;
+  font-family: var(--sans);
+  font-size: clamp(3.4rem, 9.7vw, 7rem);
+  font-weight: 760;
+  line-height: 0.9;
+  letter-spacing: -0.082em;
+}
+.hero-title em {
+  font-family: var(--serif);
+  font-weight: 560;
+  letter-spacing: -0.055em;
+}
+.hero-lede {
+  max-width: 36rem;
+  margin-top: 24px;
+  color: rgba(23, 17, 12, 0.62);
+  font-size: clamp(1.06rem, 1.45vw, 1.24rem);
+  line-height: 1.55;
+}
+.hero-taste {
+  margin-block: 28px 34px;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 0.76rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(23, 17, 12, 0.64);
+}
+.hero-taste span {
+  padding: 7px 11px;
+  border: 1px solid rgba(23, 17, 12, 0.09);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.42);
+}
+.hero-cta {
+  animation: none;
+}
+.hero-price {
+  color: rgba(23, 17, 12, 0.58);
+}
+.hero-price strong {
+  font-family: var(--sans);
+  font-weight: 750;
+}
+.hero-frame {
+  transform: none;
+  border-radius: clamp(30px, 3.4vw, 48px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 88px 170px -100px rgba(23, 17, 12, 0.98);
+}
+.hero-frame .pframe-media {
+  object-position: 44% 50%;
+  transform: scale(1.12);
+  filter: saturate(0.82) contrast(1.16) brightness(0.68);
+}
+.hero-photo-shell {
+  padding: clamp(10px, 1.4vw, 16px);
+  border-radius: clamp(36px, 4vw, 58px);
+  background:
+    linear-gradient(180deg, rgba(255, 250, 242, 0.64), rgba(235, 228, 216, 0.18)),
+    rgba(255, 250, 242, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(23, 17, 12, 0.08),
+    0 50px 120px -92px rgba(23, 17, 12, 0.75);
+}
+.hero-photo-shell::before {
+  content: '';
+  position: absolute;
+  /* Contained by default. On a phone the shell spans the full content width,
+     so bleeding this glow past the right edge becomes horizontal page overflow
+     — 8% of 350px is 28px of sideways scroll on the landing page. */
+  inset: 7% 0 auto auto;
+  width: 62%;
+  height: 34%;
+  border-radius: 999px;
+  background: rgba(223, 189, 120, 0.18);
+  filter: blur(44px);
+  pointer-events: none;
+}
+@media (min-width: 900px) {
+  /* Two columns here, so there is room to the side for the glow to spill into. */
+  .hero-photo-shell::before {
+    inset: 7% -8% auto auto;
+  }
+}
+.hero-photo-caption {
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 4px 18px;
+  padding: 16px 8px 4px;
+}
+.hero-photo-caption span {
+  grid-column: 1 / -1;
+}
+.hero-photo-caption em {
+  justify-self: end;
+  color: rgba(23, 17, 12, 0.5);
+}
+
+.ritual {
+  padding-block: clamp(96px, 12vw, 172px) clamp(52px, 7vw, 92px);
+}
+.ritual-head {
+  max-width: 860px;
+}
+.section-title {
+  font-family: var(--sans);
+  font-size: clamp(2.4rem, 6.4vw, 5.4rem);
+  font-weight: 720;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+}
+.section-title em {
+  font-family: var(--serif);
+  font-weight: 560;
+}
+.ritual-list {
+  margin-top: clamp(42px, 7vw, 84px);
+}
+.ritual-item {
+  border-color: rgba(23, 17, 12, 0.09);
+}
+.ritual-num {
+  font-family: var(--sans);
+  font-style: normal;
+  color: rgba(23, 17, 12, 0.34);
+}
+.ritual-body h3 {
+  font-family: var(--sans);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.ritual-body p {
+  color: rgba(23, 17, 12, 0.62);
+}
+
+.tasting {
+  margin-top: 0;
+  background:
+    radial-gradient(circle at 76% 18%, rgba(223, 189, 120, 0.16), transparent 34rem),
+    linear-gradient(180deg, #17110c, #0d0906);
+}
+.tasting::before {
+  display: none;
+}
+.tasting-inner {
+  min-height: clamp(640px, 78vw, 860px);
+}
+.tasting .section-title {
+  color: var(--bone);
+}
+.tasting-spec {
+  padding-top: 30px;
+  border-top: 1px solid rgba(251, 246, 236, 0.14);
+}
+.tasting-spec dt {
+  color: rgba(251, 246, 236, 0.46);
+}
+.tasting-spec dd {
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 650;
+}
+.tasting-media {
+  filter: drop-shadow(0 70px 90px rgba(0, 0, 0, 0.38));
+}
+
+.plan {
+  align-items: stretch;
+  padding-block: 0 clamp(100px, 12vw, 168px);
+}
+.plan-card {
+  border: 1px solid rgba(23, 17, 12, 0.09);
+  background:
+    linear-gradient(180deg, rgba(255, 250, 242, 0.95), rgba(235, 228, 216, 0.72)),
+    var(--paper-3);
+  box-shadow: 0 70px 140px -104px rgba(23, 17, 12, 0.76);
+}
+.plan-card::before {
+  display: none;
+}
+.plan-badge {
+  color: rgba(23, 17, 12, 0.64);
+  background: rgba(23, 17, 12, 0.06);
+}
+.plan-name {
+  font-family: var(--sans);
+  font-weight: 720;
+  letter-spacing: -0.04em;
+}
+.plan-amount {
+  font-family: var(--sans);
+  font-weight: 760;
+  letter-spacing: -0.065em;
+}
+.plan-features {
+  border-color: rgba(23, 17, 12, 0.09);
+}
+.plan-features svg path,
+.summary-assure svg path {
+  stroke: #17110c;
+}
+.closer {
+  padding-block: clamp(72px, 10vw, 140px);
+  border-top: 1px solid rgba(23, 17, 12, 0.08);
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.06fr) minmax(390px, 0.8fr);
+    gap: clamp(64px, 8vw, 124px);
+  }
+  .hero-frame {
+    max-width: 520px;
     margin-left: auto;
-    margin-right: auto;
   }
-  .visual {
-    min-height: 460px;
-    margin-top: 20px;
+  .hero-photo-shell {
+    max-width: 560px;
+    margin-left: auto;
   }
-  .ritual {
-    padding-top: 72px;
+  .ritual-item:hover {
+    background: transparent;
   }
-}
-
-@media (max-width: 560px) {
-  .proof {
-    gap: 18px;
+  .ritual-body {
+    grid-template-columns: 0.8fr 1.2fr;
   }
-  .plan-meta > div {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-  .closer {
-    padding-top: 84px;
+  .tasting-inner {
+    grid-template-columns: 0.95fr 1.05fr;
   }
 }
 
-@media (max-width: 480px) {
-  .disc {
-    width: 320px;
-    height: 320px;
+@media (max-width: 639px) {
+  .hero-title {
+    max-width: 9ch;
   }
-  .glow {
-    width: 250px;
-    height: 250px;
+  .hero-visual {
+    display: grid;
   }
-  .cup-svg {
-    width: 310px;
-  }
-  .seal {
-    left: calc(50% - 150px);
-    width: 92px;
-    height: 92px;
-  }
-  .chip {
-    right: calc(50% - 150px);
-  }
-  /* The beans are positioned off the visual's centre; at this width their
-     offsets reach past the viewport, so pull them back inside. */
-  .bean.b1 {
-    left: calc(50% - 118px);
-  }
-  .bean.b2 {
-    right: calc(50% - 130px);
-  }
-  .bean.b3 {
-    display: none;
+}
+
+/* ---------- FINAL HERO IMAGE LOCK ----------
+   Keep this at the end. Earlier hero passes remain for historical layout
+   context, but these values are the reviewed production treatment. */
+.hero-photo-shell {
+  width: min(100%, 520px);
+  justify-self: end;
+  padding: clamp(10px, 1.1vw, 14px);
+  border-radius: clamp(30px, 3vw, 42px);
+  background:
+    linear-gradient(180deg, rgba(55, 42, 31, 0.16), rgba(23, 17, 12, 0.24)),
+    #e5dac8;
+  box-shadow:
+    inset 0 0 0 1px rgba(23, 17, 12, 0.18),
+    inset 0 1px 0 rgba(255, 250, 242, 0.72),
+    0 48px 118px -74px rgba(23, 17, 12, 0.88),
+    0 14px 34px -24px rgba(23, 17, 12, 0.48);
+}
+.hero-photo-shell::before {
+  opacity: 0.55;
+}
+.hero-frame {
+  border-radius: calc(clamp(30px, 3vw, 42px) - 10px);
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 246, 236, 0.12),
+    0 0 0 1px rgba(23, 17, 12, 0.18),
+    0 24px 58px -40px rgba(23, 17, 12, 0.86);
+}
+.hero-frame .pframe-media {
+  object-position: 50% 50%;
+  transform: scale(1.015);
+  filter: saturate(0.98) contrast(1.04) brightness(0.9);
+}
+.hero-photo-caption {
+  width: min(100%, 520px);
+  justify-self: end;
+}
+
+@media (max-width: 899px) {
+  .hero-photo-shell,
+  .hero-photo-caption {
+    justify-self: start;
   }
 }

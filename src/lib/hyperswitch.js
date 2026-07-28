@@ -20,7 +20,7 @@ export function getHyper() {
   if (!PUBLISHABLE_KEY) {
     return Promise.reject(
       new Error(
-        'VITE_HYPERSWITCH_PUBLISHABLE_KEY is not set. Copy .env.example to .env and add your sandbox publishable key.',
+        'VITE_HYPERSWITCH_PUBLISHABLE_KEY is not set. Add your sandbox publishable key to .env.local — see the README.',
       ),
     )
   }
@@ -29,32 +29,15 @@ export function getHyper() {
 }
 
 /**
- * Themes the widget to match the rest of the site. Values mirror the tokens in
- * styles/theme.css — the SDK renders in a cross-origin iframe, so our CSS
- * cannot reach it and every value has to be passed through explicitly.
+ * Starts fetching HyperLoader.js before the shopper reaches the payment step.
+ * Called from Checkout, so the script is already parsed and the TLS connection
+ * already open by the time the widget needs to mount — this is most of the
+ * difference between the form appearing instantly and appearing "eventually".
+ * Failures are ignored on purpose: this is an optimisation, and /payment
+ * surfaces any real error itself.
  */
-export const appearance = {
-  theme: 'soft',
-  variables: {
-    colorPrimary: '#C6892C',
-    colorBackground: '#FBF5E9',
-    colorText: '#241309',
-    colorTextSecondary: '#8A6F52',
-    colorTextPlaceholder: '#A88E6C',
-    colorDanger: '#5A1A20',
-    colorSuccess: '#4A6B3A',
-    colorWarning: '#A66E1E',
-    fontFamily: 'Inter, system-ui, sans-serif',
-    fontSizeBase: '16px',
-    spacingUnit: '4px',
-    borderRadius: '12px',
-    buttonBackgroundColor: '#C6892C',
-    buttonTextColor: '#2A1608',
-    buttonBorderRadius: '999px',
-    buttonHeight: '52px',
-    buttonTextFontSize: '16px',
-    buttonTextFontWeight: '600',
-  },
+export function prewarmHyper() {
+  getHyper().catch(() => {})
 }
 
 /** Layout and copy for the payment widget itself. */
@@ -66,6 +49,10 @@ export const unifiedCheckoutOptions = {
   paymentMethodsHeaderText: 'How would you like to pay?',
   branding: 'never',
   displaySavedPaymentMethods: false,
+  // This prototype takes one off-session-free charge: no mandate, no
+  // tokenization, nothing stored. Offering "Save card details" would promise a
+  // capability we deliberately did not build.
+  displaySavedPaymentMethodsCheckbox: false,
   terms: {
     card: 'never',
   },

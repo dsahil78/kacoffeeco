@@ -1,8 +1,8 @@
 const CLAIMS = [
-  'Single-origin, specialty grade',
-  'Roasted the day it ships',
-  'Free carbon-neutral shipping',
-  'Skip or cancel anytime',
+  'Single-origin release',
+  'Roasted to order',
+  'Ships free',
+  'Cancel anytime',
 ]
 
 export function TrustStrip() {

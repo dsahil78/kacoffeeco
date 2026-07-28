@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FlowLayout, OrderSummary } from '../components/FlowLayout.jsx'
 import { createPayment, ApiError } from '../lib/api.js'
+import { prewarmHyper } from '../lib/hyperswitch.js'
 import { PLAN, formatMoney } from '../lib/plan.js'
-import { rememberCheckout } from '../lib/session.js'
+import { recallCheckout, rememberCheckout } from '../lib/session.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const US_ZIP_RE = /^\d{5}(-\d{4})?$/
@@ -18,6 +19,24 @@ const EMPTY = {
   state: '',
   zip: '',
   country: 'US',
+}
+
+function initialValues() {
+  const handoff = recallCheckout()
+  const shipping = handoff?.shipping ?? {}
+
+  return {
+    ...EMPTY,
+    email: handoff?.email ?? '',
+    firstName: shipping.firstName ?? '',
+    lastName: shipping.lastName ?? '',
+    line1: shipping.line1 ?? '',
+    line2: shipping.line2 ?? '',
+    city: shipping.city ?? '',
+    state: shipping.state ?? '',
+    zip: shipping.zip ?? '',
+    country: shipping.country ?? EMPTY.country,
+  }
 }
 
 /** Client-side mirror of the server's rules — the server is still the authority. */
@@ -40,11 +59,18 @@ function validate(values) {
 
 export default function Checkout() {
   const navigate = useNavigate()
-  const [values, setValues] = useState(EMPTY)
+  const [values, setValues] = useState(initialValues)
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState(null)
+
+  // Fetch the payment SDK while the shopper fills in their address. By the time
+  // they reach /payment the script is parsed and the connection is open, which
+  // is most of the difference between the form being there and "loading…".
+  useEffect(() => {
+    prewarmHyper()
+  }, [])
 
   const set = (name) => (event) => {
     const { value } = event.target
@@ -96,11 +122,18 @@ export default function Checkout() {
         orderId: result.order_id,
         clientSecret: result.client_secret,
         paymentId: result.payment_id,
+        email: payload.email,
+        shipping: payload.shipping,
       })
 
       navigate('/payment', {
         replace: true,
-        state: { orderId: result.order_id, clientSecret: result.client_secret },
+        state: {
+          orderId: result.order_id,
+          clientSecret: result.client_secret,
+          email: payload.email,
+          shipping: payload.shipping,
+        },
       })
     } catch (error) {
       if (error instanceof ApiError && error.fields) {
@@ -139,7 +172,7 @@ export default function Checkout() {
 
   return (
     <FlowLayout step={0}>
-      <div className="flow-grid">
+      <div className="flow-grid flow-grid--summary-first">
         <section className="flow-main">
           <span className="eyebrow">Almost there</span>
           <h1 className="flow-title">

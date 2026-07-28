@@ -1,10 +1,24 @@
 /* ==========================================================================
-   Checkout flow — Checkout, Payment, Confirmation.
-   Same warm system as the landing page, tuned for focus rather than sell.
+   Checkout flow — mobile-first.
+   The payment step is the most important screen in the product, so it gets the
+   most care: reserved space, a skeleton that matches the real form, and a
+   handoff you feel rather than notice.
    ========================================================================== */
 
 .flow {
-  padding: 10px 0 40px;
+  padding-block: 4px var(--section-tight);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- STEPS ---------- */
@@ -12,70 +26,89 @@
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 0 0 46px;
+  gap: 8px;
+  margin: 0 0 30px;
   padding: 0;
-  flex-wrap: wrap;
 }
 .step {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  font-size: 0.8rem;
+  gap: 8px;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   color: var(--dim);
 }
 .step + .step::before {
   content: '';
-  width: 26px;
+  width: 16px;
   height: 1px;
   background: var(--hairline-strong);
-  margin-right: 3px;
 }
 .step-dot {
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.74rem;
-  border: 1px solid var(--hairline-strong);
-  background: transparent;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  box-shadow: inset 0 0 0 1px var(--hairline-strong);
+  transition:
+    background var(--t-mid) var(--ease-out),
+    color var(--t-mid) var(--ease-out),
+    box-shadow var(--t-mid) var(--ease-out);
 }
 .step--current {
   color: var(--espresso);
 }
 .step--current .step-dot {
   background: linear-gradient(135deg, var(--crema-hi), var(--crema) 52%, var(--crema-lo));
-  border-color: transparent;
-  color: #2a1608;
   box-shadow: var(--shadow-gold);
+  color: #2a1608;
 }
 .step--done {
   color: var(--crema-lo);
 }
 .step--done .step-dot {
   background: var(--espresso);
-  border-color: var(--espresso);
+  box-shadow: none;
   color: var(--crema-hi);
+}
+/* Only the current step keeps its label on a phone — the rest are dots. */
+.step--todo .step-label,
+.step--done .step-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .steps {
+    gap: 12px;
+    margin-bottom: 44px;
+  }
+  .step + .step::before {
+    width: 26px;
+  }
+  .step--todo .step-label,
+  .step--done .step-label {
+    display: inline;
+  }
 }
 
 /* ---------- LAYOUT ---------- */
 .flow-grid {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 56px;
-  align-items: start;
+  gap: 34px;
 }
 .flow-main {
   min-width: 0;
 }
 .flow-title {
-  font-size: clamp(2.1rem, 4vw, 3.1rem);
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  font-size: clamp(2rem, 9vw, 2.6rem);
   line-height: 1.04;
-  margin-bottom: 16px;
+  margin: 0 0 14px;
 }
 .flow-title em {
   font-style: italic;
@@ -83,78 +116,305 @@
 }
 .flow-lede {
   color: var(--dim);
-  font-size: 1.04rem;
+  font-size: 1rem;
   max-width: 52ch;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
 }
 .flow-main .notice {
-  margin-bottom: 26px;
+  margin-bottom: 22px;
+}
+.flow-empty {
+  max-width: 62ch;
+  padding-block: 8px var(--section-tight);
+}
+
+@media (min-width: 900px) {
+  .flow-grid {
+    grid-template-columns: 1fr 372px;
+    gap: 56px;
+    align-items: start;
+  }
+  .flow-title {
+    font-size: clamp(2.4rem, 3.6vw, 3.1rem);
+  }
 }
 
 /* ---------- FORM ---------- */
 .checkout-form fieldset {
   border: none;
-  margin: 0 0 32px;
+  margin: 0 0 28px;
   padding: 0;
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 .checkout-form legend {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   padding: 0;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .form-hint {
-  font-size: 0.8rem;
+  font-size: 0.79rem;
   color: var(--dim);
-  margin: -4px 0 0;
+  margin: -2px 0 0;
 }
 .form-fine {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 7px;
   flex-wrap: wrap;
   text-align: center;
-  font-size: 0.79rem;
+  font-size: 0.77rem;
   color: var(--dim);
-  margin: 18px 0 0;
+  margin: 16px 0 0;
+  line-height: 1.5;
 }
 
-/* ---------- PAYMENT WIDGET ---------- */
-.pay-panel {
-  background: #fbf5e9;
-  border: 1px solid var(--hairline-strong);
-  border-radius: 22px;
-  padding: 24px;
-  margin-bottom: 24px;
-  min-height: 220px;
+.flow-main .notice--error {
+  display: grid;
+  gap: 3px;
 }
-.pay-loading {
+.flow-main .notice--error strong {
+  font-size: 0.82rem;
+}
+.flow-main .notice--error span {
+  color: inherit;
+}
+
+/* ==========================================================================
+   PAYMENT STAGE
+   The container reserves height before the widget exists, so the page never
+   reflows underneath the shopper. min-height eases to the widget's measured
+   height once it reports ready.
+   ========================================================================== */
+.pay-hero {
+  max-width: 58ch;
+}
+.pay-review {
+  display: grid;
+  gap: 0;
+  margin: 0 0 18px;
+  padding: 0;
+  border-radius: 22px;
+  background: rgba(255, 253, 248, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(90, 26, 32, 0.1),
+    0 22px 54px -44px rgba(58, 36, 21, 0.42);
+  overflow: hidden;
+}
+.pay-review-head {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(90, 26, 32, 0.09);
   color: var(--dim);
-  font-size: 0.92rem;
-  padding: 40px 4px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
+.pay-review-grid {
+  display: grid;
+  gap: 0;
+}
+.pay-review-item {
+  min-width: 0;
+  padding: 17px 18px;
+}
+.pay-review-item + .pay-review-item {
+  border-top: 1px solid rgba(90, 26, 32, 0.09);
+}
+.pay-review-item--shipping {
+  background: transparent;
+  box-shadow: none;
+}
+.pay-review-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--dim);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+.pay-review-value {
+  display: block;
+  overflow: hidden;
+  color: var(--espresso);
+  font-size: 0.96rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pay-review-address {
+  margin: 0;
+  color: var(--espresso);
+  font-style: normal;
+  font-size: clamp(0.98rem, 1.6vw, 1.08rem);
+  font-weight: 680;
+  line-height: 1.48;
+  white-space: pre-line;
+}
+.pay-review-edit {
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.pay-stage {
+  position: relative;
+  background: rgba(255, 253, 248, 0.82);
+  border-radius: 22px;
+  padding: 16px;
+  margin-bottom: 22px;
+  box-shadow:
+    inset 0 0 0 1px rgba(90, 26, 32, 0.13),
+    0 18px 44px -36px rgba(58, 36, 21, 0.48);
+  transition: min-height var(--t-slow) var(--ease-out);
+}
+
+/* The loader sits on top and fades out; the widget fades in underneath. Both
+   occupy the same box, so nothing moves during the handoff. */
+.pay-loading {
+  position: absolute;
+  inset: 16px;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  opacity: 1;
+  transition: opacity var(--t-mid) var(--ease-out);
+  pointer-events: none;
+}
+.pay-stage.is-ready .pay-loading {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--t-mid) var(--ease-out),
+    visibility 0s linear var(--t-mid);
+}
+.pay-loading-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 253, 248, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(90, 26, 32, 0.1);
+  color: var(--dim);
+}
+.pay-loading-card .spinner {
+  margin-top: 3px;
+  color: var(--crema-lo);
+}
+.pay-loading-title {
+  margin: 0;
+  color: var(--espresso);
+  font-size: 0.91rem;
+  font-weight: 700;
+}
+.pay-loading-copy {
+  margin: 2px 0 0;
+  color: var(--dim);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .pay-mount {
-  min-height: 1px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--t-slow) var(--ease-out),
+    transform var(--t-slow) var(--ease-out);
+}
+.pay-stage.is-ready .pay-mount {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- SKELETON ----------
+   Mirrors the widget's anatomy: method tabs, card number, expiry + CVC. */
+.pay-skeleton {
+  display: grid;
+  gap: 16px;
+}
+.sk-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.sk-tab {
+  height: 46px;
+  border-radius: 12px;
+}
+.sk-tab:first-child {
+  /* The selected tab reads slightly stronger, like the real one. */
+  background-image: linear-gradient(
+    90deg,
+    rgba(198, 137, 44, 0.16) 0%,
+    rgba(198, 137, 44, 0.3) 50%,
+    rgba(198, 137, 44, 0.16) 100%
+  );
+}
+.sk-field {
+  display: grid;
+  gap: 7px;
+}
+.sk-label {
+  height: 9px;
+  width: 84px;
+  border-radius: 5px;
+}
+.sk-input {
+  height: 46px;
+  border-radius: 12px;
+}
+.sk-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pay-cta {
+  transition:
+    transform var(--t-fast) var(--ease-out),
+    box-shadow var(--t-mid) var(--ease-out),
+    opacity var(--t-mid) var(--ease-out);
+}
+
+@media (min-width: 640px) {
+  .pay-review {
+    max-width: 760px;
+  }
+  .pay-review-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(210px, 0.85fr);
+    align-items: stretch;
+  }
+  .pay-review-item {
+    padding: 20px 22px;
+  }
+  .pay-review-item + .pay-review-item {
+    border-top: 0;
+    border-left: 1px solid rgba(90, 26, 32, 0.09);
+  }
+  .pay-stage {
+    padding: 22px;
+    border-radius: 26px;
+  }
+  .pay-loading {
+    inset: 22px;
+  }
 }
 
 /* ---------- SUMMARY RAIL ---------- */
-.summary {
-  position: sticky;
-  top: 28px;
-}
 .summary-card {
-  background: linear-gradient(170deg, #fbf5e9, var(--paper-2));
-  border: 1px solid rgba(198, 137, 44, 0.35);
-  border-radius: 26px;
-  padding: 30px 28px;
-  box-shadow: var(--shadow-card);
+  background: linear-gradient(168deg, #fdf8ee, var(--paper-2));
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
 }
@@ -165,27 +425,79 @@
   height: 4px;
   background: linear-gradient(90deg, var(--crema-hi), var(--crema) 52%, var(--crema-lo));
 }
+.summary-head {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.summary-media {
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+.summary-id .eyebrow {
+  margin-bottom: 8px;
+}
 .summary-name {
-  font-size: 1.5rem;
+  font-size: 1.28rem;
   line-height: 1.15;
 }
-.summary-blurb {
+.summary-origin {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
   color: var(--dim);
-  font-size: 0.9rem;
-  margin: 10px 0 22px;
 }
+.summary-notes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: rgba(198, 137, 44, 0.09);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.92rem;
+  color: var(--mocha);
+}
+.summary-notes svg {
+  flex: 0 0 auto;
+}
+
+.summary-spec {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin: 0 0 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--hairline);
+}
+.summary-spec dt {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 3px;
+}
+.summary-spec dd {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 .summary-lines {
   margin: 0;
   display: grid;
-  gap: 12px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--hairline);
+  gap: 10px;
 }
 .summary-lines > div {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 }
 .summary-lines dt {
   color: var(--dim);
@@ -194,13 +506,19 @@
   margin: 0;
   font-weight: 500;
 }
+.summary-lines .is-free {
+  color: #3f6b2f;
+}
+
 .summary-total {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  padding: 18px 0 4px;
-  font-size: 0.82rem;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -208,55 +526,83 @@
 }
 .summary-total-amt {
   font-family: var(--serif);
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   text-transform: none;
   color: var(--espresso);
   font-variant-numeric: tabular-nums;
 }
-.summary-fine {
-  font-size: 0.78rem;
+
+.summary-assure {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.summary-assure li {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 10px;
+  align-items: start;
+  font-size: 0.79rem;
   color: var(--dim);
-  margin: 12px 0 0;
+}
+.summary-assure svg {
+  margin-top: 3px;
 }
 .summary-back {
   display: inline-block;
-  margin-top: 22px;
+  margin-top: 18px;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--crema-lo);
-  text-decoration: none;
-}
-.summary-back:hover {
-  color: var(--oxblood);
 }
 
-/* ---------- CONFIRMATION ---------- */
-.flow-empty {
-  max-width: 62ch;
-  padding: 20px 0 40px;
+@media (min-width: 640px) {
+  .summary-card {
+    padding: 26px;
+  }
+  .summary-head {
+    grid-template-columns: 96px 1fr;
+  }
 }
+@media (min-width: 900px) {
+  .summary {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+/* On a phone the order summary leads on the *details* step — you should know
+   what you are buying before you start typing an address.
+ *
+ * It deliberately does NOT lead on the payment step. Beyond the card form being
+ * the point of that screen, Unified Checkout only lays out once its mount is
+ * actually in the viewport: with a tall summary above it, the widget stayed
+ * collapsed at 9px and the shopper saw an empty box. Keeping the form at the
+ * top of the page is what makes it render at all on a phone. */
+@media (max-width: 899px) {
+  .flow-grid--summary-first .summary {
+    order: -1;
+  }
+}
+
+/* ==========================================================================
+   CONFIRMATION
+   ========================================================================== */
 .confirm {
-  animation: fade-up 0.4s ease both;
+  animation: fade-up var(--t-slow) var(--ease-out) both;
 }
 .confirm-mark {
   position: relative;
   width: 72px;
   height: 72px;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   display: grid;
   place-items: center;
 }
-.confirm-mark--good .pulse {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 2px solid var(--crema);
-  animation: pulse-ring 2.4s ease-out infinite;
-}
 .confirm-mark--bad {
-  filter: saturate(0.35) brightness(0.92);
+  filter: saturate(0.3) brightness(0.92);
 }
 .eyebrow--bad {
   color: var(--oxblood);
@@ -265,67 +611,32 @@
   background: var(--oxblood);
 }
 
-.next-steps {
-  list-style: none;
-  counter-reset: step;
-  margin: 4px 0 34px;
-  padding: 0;
-  display: grid;
-  gap: 14px;
-}
-.next-steps li {
-  counter-increment: step;
-  position: relative;
-  padding-left: 40px;
-  color: var(--dim);
-  font-size: 0.94rem;
-}
-.next-steps li::before {
-  content: counter(step);
-  position: absolute;
-  left: 0;
-  top: 1px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-family: var(--serif);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #2a1608;
-  background: linear-gradient(135deg, var(--crema-hi), var(--crema-lo));
-}
-.next-steps strong {
-  color: var(--espresso);
-}
-
 .confirm-meta {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  margin: 0 0 34px;
-  padding: 22px 24px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 0 0 28px;
+  padding: 20px;
   background: var(--paper-2);
-  border: 1px solid var(--hairline);
   border-radius: 18px;
 }
 .confirm-meta dt {
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--dim);
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 .confirm-meta dd {
   margin: 0;
-  font-size: 0.94rem;
+  font-size: 0.91rem;
   font-weight: 500;
 }
 .mono {
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
-  font-size: 0.88rem !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.02em;
 }
 .status {
   text-transform: capitalize;
@@ -340,48 +651,338 @@
 .status--created {
   color: var(--crema-lo);
 }
-
 .confirm-polling {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   color: var(--dim);
-  margin: 0 0 26px;
+  margin: 0 0 24px;
 }
 .confirm-actions {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 12px;
+  justify-items: stretch;
 }
-
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 980px) {
-  .flow-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
+@media (min-width: 480px) {
+  .confirm-actions {
+    grid-auto-flow: column;
+    justify-content: start;
   }
-  /* Summary first on narrow screens: know the price before filling the form. */
-  .summary {
-    position: static;
-    order: -1;
-  }
-}
-
-@media (max-width: 620px) {
   .confirm-meta {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .steps {
-    gap: 8px;
+}
+
+/* ==========================================================================
+   CELEBRATION — the payoff screen
+   ========================================================================== */
+.celebrate {
+  position: relative;
+  max-width: 640px;
+  /* Centred on wide screens: the payoff screen has no second column, and a
+     left-hugged block on a 1440px canvas reads as an unfinished layout. */
+  margin-inline: auto;
+  padding-block: 12px var(--section-tight);
+  animation: fade-up var(--t-slow) var(--ease-out) both;
+}
+
+.celebrate-seal {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 26px;
+}
+.celebrate-seal > svg {
+  position: relative;
+  z-index: 2;
+  animation: seal-in 900ms var(--ease-out) both;
+}
+@keyframes seal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-25deg);
   }
-  .step + .step::before {
-    width: 14px;
+  to {
+    opacity: 1;
+    transform: none;
   }
-  .step-label {
+}
+.celebrate-seal .ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--crema);
+  animation: pulse-ring 2.8s var(--ease-out) infinite;
+}
+.celebrate-seal .ring-2 {
+  animation-delay: 1.2s;
+}
+/* A short burst of light behind the seal, once. */
+.celebrate-seal .rays {
+  position: absolute;
+  inset: -34px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(230, 187, 99, 0.5), transparent 62%);
+  animation: rays 1.6s var(--ease-out) both;
+}
+@keyframes rays {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.42;
+    transform: scale(1);
+  }
+}
+
+.celebrate-eyebrow {
+  color: var(--crema-lo);
+}
+.celebrate-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 9.5vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  margin: 0 0 16px;
+}
+.celebrate-title em {
+  font-style: italic;
+  color: var(--crema-lo);
+}
+.celebrate-lede {
+  color: var(--dim);
+  font-size: 1.02rem;
+  max-width: 48ch;
+  margin: 0 0 30px;
+}
+
+/* ---------- MEMBER CARD (a keepsake, not a receipt) ---------- */
+.member-card {
+  position: relative;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 36px;
+  color: var(--bone);
+  background:
+    radial-gradient(120% 140% at 12% 0%, #4a2e19 0%, #2c1a0d 46%, #1c1008 100%);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: fade-up var(--t-slow) var(--ease-out) 260ms both;
+}
+.member-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--crema-hi), var(--crema) 52%, var(--crema-lo));
+}
+/* A slow gold sheen crossing the card, like light over foil. */
+.member-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 34%,
+    rgba(230, 187, 99, 0.16) 50%,
+    transparent 66%
+  );
+  transform: translateX(-100%);
+  animation: sheen 5.5s var(--ease-in-out) 1s infinite;
+  pointer-events: none;
+}
+@keyframes sheen {
+  0% {
+    transform: translateX(-100%);
+  }
+  55%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+.member-card-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 20px;
+}
+.member-card-brand {
+  display: grid;
+  line-height: 1.1;
+  margin-right: auto;
+}
+.member-card-brand strong {
+  font-family: var(--serif);
+  font-size: 1.02rem;
+}
+.member-card-brand em {
+  font-style: normal;
+  font-size: 0.56rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--crema-hi);
+  margin-top: 4px;
+}
+.member-card-badge {
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--crema-hi);
+  background: rgba(230, 187, 99, 0.14);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+.member-card-rows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  position: relative;
+  z-index: 1;
+}
+.member-card-rows dt {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(247, 239, 225, 0.5);
+  margin-bottom: 4px;
+}
+.member-card-rows dd {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.member-card .status--succeeded {
+  color: #a8d08d;
+}
+
+.celebrate-next-title {
+  font-size: 1.16rem;
+  margin-bottom: 18px;
+}
+.next-steps {
+  list-style: none;
+  margin: 0 0 34px;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+.next-steps li {
+  display: grid;
+  gap: 5px;
+  padding-block: 16px;
+  border-top: 1px solid var(--hairline);
+}
+.next-steps li:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+.next-when {
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--crema-lo);
+}
+.next-what {
+  font-size: 0.93rem;
+  color: var(--dim);
+}
+.next-what strong {
+  color: var(--espresso);
+  font-weight: 600;
+}
+
+.celebrate-actions {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+.celebrate-fine {
+  font-size: 0.8rem;
+  color: var(--dim);
+}
+
+@media (min-width: 640px) {
+  .member-card {
+    padding: 24px;
+  }
+  .next-steps li {
+    grid-template-columns: 130px 1fr;
+    gap: 20px;
+    align-items: baseline;
+    padding-block: 18px;
+  }
+  .celebrate-actions {
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: start;
+    gap: 20px;
+  }
+}
+
+/* ---------- CONFETTI ---------- */
+.confetti {
+  position: absolute;
+  inset: -20px 0 auto 0;
+  height: 340px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.confetti-bit {
+  position: absolute;
+  top: -24px;
+  left: calc(var(--i) * 8.5%);
+  width: 9px;
+  height: 13px;
+  border-radius: 46% 46% 50% 50%;
+  opacity: 0;
+  animation: fall 3.4s var(--ease-in-out) calc(var(--i) * 130ms) 1 both;
+}
+.confetti-bit.c0 {
+  background: var(--crema);
+}
+.confetti-bit.c1 {
+  background: var(--crema-hi);
+}
+.confetti-bit.c2 {
+  background: var(--mocha);
+}
+.confetti-bit.c3 {
+  background: var(--caramel);
+}
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) rotate(0deg);
+  }
+  12% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(320px) rotate(420deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
     display: none;
   }
-  .step--current .step-label {
-    display: inline;
+  .member-card::after {
+    display: none;
+  }
+  .celebrate-seal .rays {
+    opacity: 0.42;
   }
 }

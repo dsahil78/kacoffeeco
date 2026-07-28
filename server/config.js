@@ -81,7 +81,7 @@ export function assertConfigured() {
   if (missing.length) {
     const error = new Error(
       `Server is not configured. Missing environment variables: ${missing.join(', ')}. ` +
-        'Copy .env.example to .env and fill it in.',
+        'Set them in .env.local (or .env) — the full list is in the README.',
     )
     error.statusCode = 503
     error.publicMessage =

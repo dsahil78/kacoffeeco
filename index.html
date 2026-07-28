@@ -10,6 +10,11 @@
       content="Single-origin beans, roasted the day we ship and ground for your brew. One plan, $49 a month, seriously good coffee on your counter."
     />
     <title>Kick Ass Coffee Co. — Mornings, meet your match.</title>
+    <!-- Checkout-critical first: the payment SDK is the slowest thing on the
+         critical path, so warm its connection before anything decorative. -->
+    <link rel="preconnect" href="https://beta.hyperswitch.io" crossorigin />
+    <link rel="dns-prefetch" href="https://beta.hyperswitch.io" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

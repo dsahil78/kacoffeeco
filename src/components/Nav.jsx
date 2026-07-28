@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { Wordmark } from './CremaSeal.jsx'
 
 /**
- * Site nav. `compact` drops the section links and the cart glyph — used on the
+ * Site nav. `compact` drops the section links and primary CTA — used on the
  * checkout flow, where the only useful action is getting back out.
  */
 export function Nav({ compact = false }) {
@@ -29,24 +29,8 @@ export function Nav({ compact = false }) {
           </span>
         ) : (
           <>
-            <svg
-              className="cart"
-              width="21"
-              height="21"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M6 6h15l-1.5 9h-12L6 6zM6 6L5 3H2m5 18a1 1 0 100-2 1 1 0 000 2zm11 0a1 1 0 100-2 1 1 0 000 2z"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
             <Link to="/checkout" className="btn btn-primary">
-              Start the Kick
+              Order now
             </Link>
           </>
         )}

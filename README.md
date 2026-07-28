@@ -21,7 +21,7 @@ A working prototype of a premium ground-coffee subscription: one product, one pl
 
 ```bash
 npm install
-cp .env.example .env      # then fill it in — see "Environment" below
+# create .env.local and fill it in — every variable is listed under "Environment" below
 npm run dev               # Express on :3001, Vite on :5173
 ```
 
@@ -44,9 +44,10 @@ Check the server is wired up: `curl localhost:3001/api/health` → `{"ok":true,"
 
 ## Environment
 
-Copy `.env.example` to `.env` (or `.env.local` — both are read, and `.env.local` wins, the
-same precedence Vite uses). The split matters: **Vite only inlines variables prefixed
-`VITE_`**, and that prefix is the boundary keeping secrets out of the bundle.
+Create `.env.local` (or `.env` — both are read, and `.env.local` wins, the same precedence
+Vite uses). Every variable is listed below. The split matters: **Vite only inlines
+variables prefixed `VITE_`**, and that prefix is the boundary keeping secrets out of the
+bundle.
 
 ### Server-only
 
@@ -188,7 +189,7 @@ will not exercise the webhook path.
 ## Deploying to Vercel
 
 1. Import the repo. The Vite preset in `vercel.json` is picked up automatically.
-2. Add every variable from `.env.example` in **Settings → Environment Variables**. Set
+2. Add every variable from the tables above in **Settings → Environment Variables**. Set
    `APP_BASE_URL` to the real deployment URL.
 3. Deploy, then register the webhook at
    `https://<your-app>.vercel.app/api/webhooks/hyperswitch`.
@@ -225,19 +226,79 @@ supabase/migrations/      Schema as SQL
 
 ---
 
+## The payment loading experience
+
+The payment step is the most important screen in the product, so it is the most carefully
+built one.
+
+- **The container reserves its height up front** (`RESERVED_HEIGHT`, measured from the real
+  sandbox widget) so the page never reflows underneath the shopper.
+- **A skeleton mirrors the real widget's anatomy** — method tabs, card number, expiry/CVC —
+  so the handoff reads as the same form resolving into focus, not one thing swapped for
+  another. "Preparing your secure checkout…" sits above it, with a `role="status"`
+  announcement for screen readers.
+- **Handoff waits on the SDK's own `ready` event**, not on `mount()` returning. Those are
+  not the same moment, which is why the form used to pop in seconds after the page claimed
+  it was there. A 12s timeout reveals anyway so a missed event can never strand anyone.
+- **The skeleton crossfades out as the widget fades and lifts in**; the Pay button stays
+  disabled until the form is genuinely usable.
+- **Checkout prewarms the SDK.** `prewarmHyper()` fetches HyperLoader.js while the shopper
+  is typing their address, and `index.html` preconnects to the SDK origin before anything
+  decorative.
+
+Measured on the production build against the live sandbox:
+
+| | mobile (390px) | desktop (1440px) |
+| --- | --- | --- |
+| Skeleton visible | 109 ms | 112 ms |
+| Widget ready | 4.3 s | 4.4 s |
+| Stage height movement | 0 px | 4 px |
+| Cumulative Layout Shift | **0.0031** | **0.0027** |
+
+Two things worth knowing if you touch this screen:
+
+1. **Unified Checkout only lays out once its mount is in the viewport.** Put anything tall
+   above it on a phone and the iframe stays collapsed at 9px — an empty box. That is why
+   the order summary leads on the *details* step but not on the *payment* step
+   (`.flow-grid--summary-first`).
+2. **Do not animate the container shrinking to meet a shorter widget.** Every frame of that
+   transition counts as a layout shift; it measured CLS 0.108 on mobile. The stage now only
+   ever grows past its reservation, which took it to 0.003.
+
 ## Design
 
 Warm and cream-forward: cream page, espresso text, a molten-crema gold gradient for
 primary actions, oxblood for depth. Fraunces for display (italic accents in crema gold),
-Inter for UI. Pill buttons, generous radii, a film-grain overlay, micro-motion that
-respects `prefers-reduced-motion`, and a visible focus ring on everything focusable.
+Inter for UI.
 
-Tokens live in [`src/styles/theme.css`](src/styles/theme.css). Every route was
-render-checked at 1440px and 390px with no horizontal overflow.
+**Mobile-first.** Base rules are the phone layout; `min-width` queries at 640 / 900 / 1200
+scale up. Inputs are 16px minimum so iOS never zooms on focus. Every route is
+render-checked at 390px and 1440px with no horizontal overflow.
 
-The hero cup is an SVG illustration standing in for product photography. It is isolated in
-`HeroVisual.jsx` behind the `.cup-svg` class — swap that one element for an `<img>` and the
-disc, glow, seal, chip and beans keep their positions.
+**Rhythm over repetition.** The landing page alternates treatments so scrolling stays
+alive: cream hero → dark trust strip → card-free editorial list → full-bleed dark lot story
+→ quiet oversized quote → the single card on the page → closer. Elevation and tonal shifts
+carry the hierarchy instead of bordered boxes.
+
+**Interaction.** One language everywhere: lift on hover, press on active, a single oxblood
+focus ring, a sheen that sweeps the primary button once, links underlining from the left,
+and scroll reveals via one shared IntersectionObserver. All of it collapses under
+`prefers-reduced-motion` — verified that revealed content stays visible rather than
+disappearing.
+
+Tokens live in [`src/styles/theme.css`](src/styles/theme.css).
+
+### Photo-ready artwork
+
+Every product visual sits in a [`ProductFrame`](src/components/ProductFrame.jsx) that owns
+the aspect ratio, rounding, lighting and object-fit. Today they hold custom SVG scenes
+(`src/components/art/`); when real photography arrives, pass `src` instead of children and
+nothing else changes — the layout cannot shift when illustration becomes photograph.
+
+```jsx
+<ProductFrame ratio="4 / 5" tone="dark"><HeroScene /></ProductFrame>
+<ProductFrame ratio="4 / 5" tone="dark" src={heroPhoto} alt="…" />
+```
 
 The Unified Checkout widget renders in a cross-origin iframe, so site CSS cannot reach it.
 It is themed separately through the `appearance` object in
@@ -264,4 +325,5 @@ and which inlines its own copy of React. Bundling a second React is a fast route
   stack traces stay in the logs.
 - Order responses carry a masked email (`s•••l@icloud.com`) rather than the address on file.
 - No raw card data is collected, transmitted or stored anywhere in this codebase.
-- `.env` is gitignored. `.env.example` holds placeholders only.
+- `.env` and `.env.local` are gitignored; no example file with placeholder keys is kept in
+  the repo, so there is nothing to accidentally fill in and commit.

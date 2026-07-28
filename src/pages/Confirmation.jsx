@@ -4,7 +4,7 @@ import { FlowLayout } from '../components/FlowLayout.jsx'
 import { CremaSeal } from '../components/CremaSeal.jsx'
 import { confirmOrder, getOrder } from '../lib/api.js'
 import { forgetCheckout } from '../lib/session.js'
-import { formatMoney } from '../lib/plan.js'
+import { formatMoney, nextRoastLabel, PLAN } from '../lib/plan.js'
 
 /**
  * Poll while the payment is still in flight. Webhook delivery is quick but not
@@ -87,7 +87,7 @@ export default function Confirmation() {
   if (loading) return <Shell><Loading /></Shell>
   if (error) return <Shell><Failed title="We lost the thread" body={error} /></Shell>
 
-  if (order.status === 'succeeded') return <Shell><Succeeded order={order} /></Shell>
+  if (order.status === 'succeeded') return <Celebration order={order} />
   if (order.status === 'failed') return <Shell><Declined order={order} /></Shell>
   return <Shell><Pending order={order} settling={settling} /></Shell>
 }
@@ -104,6 +104,117 @@ function Shell({ children }) {
   )
 }
 
+/* ------------------------------------------------------------------ *
+ * The moment worth designing for.
+ * ------------------------------------------------------------------ */
+function Celebration({ order }) {
+  return (
+    <FlowLayout step={2}>
+      <section className="celebrate">
+        <Confetti />
+
+        <div className="celebrate-seal">
+          <span className="ring ring-1" aria-hidden="true" />
+          <span className="ring ring-2" aria-hidden="true" />
+          <span className="rays" aria-hidden="true" />
+          <CremaSeal size={92} decorative />
+        </div>
+
+        <span className="eyebrow celebrate-eyebrow">You're in · Member #{shortId(order.id)}</span>
+
+        <h1 className="celebrate-title">
+          Welcome to the
+          <br />
+          <em>Kick Ass Coffee Club.</em>
+        </h1>
+
+        <p className="celebrate-lede">
+          That's {formatMoney(order.amount_cents, order.currency)} well spent. Your first bag of{' '}
+          {PLAN.spec.origin} is on the roast list, and the good mornings start {nextRoastLabel()}.
+        </p>
+
+        {/* A keepsake, not a receipt. */}
+        <div className="member-card">
+          <div className="member-card-top">
+            <CremaSeal size={34} decorative />
+            <span className="member-card-brand">
+              <strong>Kick Ass</strong>
+              <em>Coffee Club</em>
+            </span>
+            <span className="member-card-badge">Founding member</span>
+          </div>
+          <div className="member-card-rows">
+            <div>
+              <dt>Member</dt>
+              <dd>{order.email ?? 'You'}</dd>
+            </div>
+            <div>
+              <dt>Plan</dt>
+              <dd>{PLAN.name}</dd>
+            </div>
+            <div>
+              <dt>Order</dt>
+              <dd className="mono">{shortId(order.id)}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd className="status status--succeeded">Confirmed</dd>
+            </div>
+          </div>
+        </div>
+
+        <h2 className="celebrate-next-title">What happens now</h2>
+        <ol className="next-steps">
+          <li>
+            <span className="next-when">{nextRoastLabel()}</span>
+            <span className="next-what">
+              <strong>Your beans hit the roaster.</strong> Small batch, medium roast, ground for
+              your brew — or whole, if that's your thing.
+            </span>
+          </li>
+          <li>
+            <span className="next-when">Within 48 hrs</span>
+            <span className="next-what">
+              <strong>It ships, carbon-neutral.</strong> Tracking lands in your inbox the moment the
+              bag leaves us.
+            </span>
+          </li>
+          <li>
+            <span className="next-when">Every month</span>
+            <span className="next-what">
+              <strong>A new lot, same standard.</strong> Skip one, change your grind, or walk away —
+              two clicks, no phone call.
+            </span>
+          </li>
+        </ol>
+
+        <div className="celebrate-actions">
+          <Link to="/" className="btn btn-primary lg">
+            Explore the roast
+          </Link>
+          <span className="celebrate-fine">
+            A confirmation is on its way{order.email ? ` to ${order.email}` : ''}.
+          </span>
+        </div>
+      </section>
+    </FlowLayout>
+  )
+}
+
+/**
+ * Twelve falling beans. Decorative, hidden from assistive tech, and reduced to
+ * nothing by the reduced-motion rules in theme.css.
+ */
+function Confetti() {
+  return (
+    <div className="confetti" aria-hidden="true">
+      {Array.from({ length: 12 }, (_, i) => (
+        <span key={i} className={`confetti-bit c${i % 4}`} style={{ '--i': i }} />
+      ))}
+    </div>
+  )
+}
+
 function Loading() {
   return (
     <>
@@ -112,53 +223,6 @@ function Loading() {
       </div>
       <h1 className="flow-title">Checking the books…</h1>
       <p className="flow-lede">One moment while we confirm the payment went through.</p>
-    </>
-  )
-}
-
-function Succeeded({ order }) {
-  return (
-    <>
-      <div className="confirm-mark confirm-mark--good">
-        <span className="pulse" aria-hidden="true" />
-        <CremaSeal size={72} decorative />
-      </div>
-      <span className="eyebrow">Payment confirmed</span>
-      <h1 className="flow-title">
-        Welcome to the <em>Kick.</em>
-      </h1>
-      <p className="flow-lede">
-        We took {formatMoney(order.amount_cents, order.currency)} and your first bag is already on
-        the roast list.{' '}
-        {order.email ? (
-          <>
-            The confirmation is on its way to <strong>{order.email}</strong>.
-          </>
-        ) : (
-          'Your confirmation email is on its way.'
-        )}
-      </p>
-
-      <ol className="next-steps">
-        <li>
-          <strong>Tomorrow</strong> — your beans go in the roaster. Small batch, medium roast,
-          ground for your brew.
-        </li>
-        <li>
-          <strong>Within 48 hours</strong> — the bag ships carbon-neutral, with tracking in your
-          inbox.
-        </li>
-        <li>
-          <strong>Next month</strong> — we do it again. Skip or cancel any time, no phone call
-          required.
-        </li>
-      </ol>
-
-      <OrderMeta order={order} />
-
-      <Link to="/" className="btn btn-dark lg">
-        Back to the roast
-      </Link>
     </>
   )
 }
@@ -263,11 +327,11 @@ function OrderMeta({ order }) {
     <dl className="confirm-meta">
       <div>
         <dt>Order</dt>
-        <dd className="mono">{order.id.slice(0, 8)}</dd>
+        <dd className="mono">{shortId(order.id)}</dd>
       </div>
       <div>
         <dt>Plan</dt>
-        <dd>The Monthly Kick</dd>
+        <dd>{PLAN.name}</dd>
       </div>
       <div>
         <dt>Amount</dt>
@@ -279,4 +343,8 @@ function OrderMeta({ order }) {
       </div>
     </dl>
   )
+}
+
+function shortId(id) {
+  return String(id).slice(0, 8).toUpperCase()
 }
